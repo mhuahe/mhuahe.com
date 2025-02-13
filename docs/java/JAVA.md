@@ -175,11 +175,9 @@ LocalDate.minus()
 
 > List实现类
 
-```sql
-1.ArrayList 底层数组，插入是什么顺序，取出就是什么顺序，注意如果按索引插入，如插入3处，则本来的3及后面的都会后移一位索引
-2.Vector 同ArrayList，是ArrayList的安全集合
-3.LinkedList 底层链表
-```
+- ArrayList 底层数组，插入是什么顺序，取出就是什么顺序，**注意如果按索引插入，如插入3处，则本来的3及后面的都会后移一位索引**
+- Vector 同ArrayList，是ArrayList的安全集合
+- LinkedList 底层链表
 
 #### Set
 

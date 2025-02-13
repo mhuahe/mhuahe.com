@@ -253,54 +253,79 @@ $ docker push h1075335917/myhello-world:latest
 
 #### 微服务镜像命令
 
+- 配置文件
+
 ```shell
-配置文件：需要改镜像版本
-nacos本地配置 -- 还原成${userName:nacos}模式
-1./usr/local/install/docker_project目录下docker-composeduibi.yml查看镜像名称
+# image为镜像名称
+# container_name为容器名称
 version: '2'
 services:
   enfc-gateway:
     container_name: enfc-gateway
     image: llyf999/enfc-gateway:v1.1
-image为镜像名称
-container_name为容器名称
-
-2.删除容器和镜像 , docker stop 容器名 , docker rm 容器名 , docker rmi 镜像id
-
-3.打包镜像
-docker build -f **DockerFile -t 镜像名 ./
-**DockerFile为/usr/local/dockerBuilder目录下的对应模块的DockerFile,如thirdPartyDockerfile
-镜像名就是image
-或者
-docker-compse build 服务名
-
-4.生成容器
-docker-compose -f 指定文件 up -d 容器名
-这里指定文件为docker-composeduibi.yml
-容器名为container_name
-
-5.上传镜像
-docker push 镜像名
-镜像名为image
-
-6.保存镜像
-docker save llyf999/enfc-face:v1.2c3c4 > ./enfc-face-c3c4-images-0420.tar
-
-
-用户模块和人脸模块需要挂载图片路径
-
-
-7.镜像导入导出
-导出镜像
-docker save 镜像名称:版本号 > 文件名.tar
-导入镜像
-docker load < 文件名.tar
-镜像重命名
-sudo docker image tag ef7da1212d31  llyf999/enfc-face:v1.2.3c3c4
-
-8.进入容器
-docker exec -it system-start /bin/bash
 ```
+
+- 删除容器和镜像
+
+```shell
+docker stop 容器名 , docker rm 容器名 , docker rmi 镜像id
+```
+
+- 打包镜像
+
+```shell
+# **DockerFile为/usr/local/dockerBuilder目录下的对应模块的DockerFile,如thirdPartyDockerfile
+# 镜像名就是image
+docker build -f **DockerFile -t 镜像名 ./
+# 或者
+docker-compse build 服务名
+```
+
+- 生成容器
+
+```shell
+# 默认指定文件为docker-compose.yml
+# 容器名为container_name
+docker-compose -f 指定文件 up -d 容器名
+```
+
+- 上传镜像
+
+```shell
+# 镜像名为image
+docker push 镜像名
+```
+
+- 保存镜像
+
+```shell
+docker save llyf999/enfc-face:v1.2c3c4 > ./enfc-face-c3c4-images-0420.tar
+```
+
+- 镜像导入导出
+
+```shell
+# 导出镜像
+docker save 镜像名称:版本号 > 文件名.tar
+# 导入镜像
+docker load < 文件名.tar
+# 镜像重命名
+sudo docker image tag ef7da1212d31  llyf999/enfc-face:v1.2.3c3c4
+```
+
+- 进入容器
+
+```shell
+# 进入容器并启动交互式终端
+docker exec -it <容器ID或容器名称> /bin/bash
+
+# 如果容器中没有 bash，可以使用 sh
+docker exec -it <容器ID或容器名称> /bin/sh
+```
+
+- i: 交互式
+- t: 分配一个伪终端
+- privileged: 如果需要更高权限可以添加此参数
 
 ## 部署
 
