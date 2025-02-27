@@ -257,3 +257,136 @@ Spring 5.3.27+
 Maven 3.5+
 Gradle 6.8.x, 6.9.x, 7.x, 8.x
 ```
+
+### 2.2.x
+
+#### Logback
+
+> 从 Spring Boot 2.2 开始，官方 移除了这些默认的 Logback 配置文件，因此不能再使用 `<include>` 方式 直接引入默认的 Logback 配置，而需要 手动定义 logback-spring.xml 进行等效配置。
+
+```xml
+<configuration>
+    <!-- 定义日志文件目录 -->
+    <property name="LOG_PATH" value="./logs" />
+
+    <!-- 控制台日志输出（等效于 console-appender.xml） -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 日志文件输出（等效于 file-appender.xml） -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/app.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/app-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- 只保留最近 30 天的日志 -->
+        </rollingPolicy>
+    </appender>
+
+    <!-- 全局日志级别 -->
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
+```
+
+#### logback.xml 和 logback-spring.xml 区别
+
+> 在 Spring Boot 项目中，`logback.xml` 和 `logback-spring.xml` 都可以作为 Logback 的配置文件，但它们有以下几个关键区别
+
+1. `logback.xml`
+- **标准 Logback 配置文件**（与 Spring Boot 无关）。
+- **Spring Boot 不会解析其中的 Spring 配置（如 `SpringProperty` 或占位符 `${}`）**。
+- Logback **会在 Spring Boot 之外**的环境中正常使用它（例如，非 Spring Boot 项目也可以使用）。
+- 由于 Spring Boot **在日志系统初始化之前**就会加载 `logback.xml`，所以**Spring Boot 的 `application.properties` 里的日志配置不会被解析**。
+
+**📝 适用场景**
+✅ 适用于 **非 Spring Boot 项目** 或 **不需要使用 Spring 变量** 的日志配置。  
+❌ **不支持** Spring Boot `application.properties` 里的变量。
+
+2. `logback-spring.xml`
+- **Spring Boot 推荐使用的 Logback 配置文件**。
+- **允许使用 `SpringProperty` 以及 `${}` 解析 `application.properties` 里的变量**。
+- **日志系统会在 Spring Boot 加载 `application.properties` 之后初始化**，这样就能正确解析 Spring 配置的变量。
+
+**📝 适用场景**
+✅ 适用于 **Spring Boot 项目**，可以使用 **`application.properties` 里的日志变量**。  
+✅ 支持 **Spring Profile**，可以在 `logback-spring.xml` 里用 `<springProfile>` 标签来区分环境。  
+❌ **不能被标准的 Logback 直接使用**，仅适用于 Spring Boot 项目。
+
+3. 核心区别总结
+
+| **区别** | **logback.xml** | **logback-spring.xml** |
+|----------|----------------|------------------------|
+| **Spring Boot 推荐** | ❌（不推荐） | ✅（官方推荐） |
+| **支持 Spring 配置** | ❌（不能解析 `application.properties` 变量） | ✅（可以解析 `application.properties` 变量） |
+| **加载时机** | **Spring Boot 之前**（不能使用 Spring 变量） | **Spring Boot 之后**（能解析 Spring 变量） |
+| **支持 Spring Profile** | ❌ | ✅（支持 `<springProfile>`） |
+| **适用于普通 Java 项目** | ✅ | ❌ |
+
+
+4. `logback-spring.xml` 的优势
+如果你希望在 `application.properties` 中配置日志路径：
+
+```properties
+LOG_FILE=./logs/myapp.log
+```
+
+然后在 `logback.xml` 里使用：
+```xml
+<property name="LOG_FILE" value="${LOG_FILE}"/>
+```
+💥 **这在 `logback.xml` 里是无效的**，因为 `logback.xml` 加载时，Spring Boot 还没有解析 `application.properties`，导致 `LOG_FILE` 变量为空。
+
+✅ **解决方案：改用 `logback-spring.xml`**
+```xml
+<configuration>
+    <springProperty name="LOG_FILE" source="LOG_FILE"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-./logs/default.log}"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
+```
+💡 这样 `LOG_FILE` 就能从 **`application.properties` 读取**，如果没有定义，则使用默认值 `./logs/default.log`。
+
+5. Spring Profile 的支持（仅限 `logback-spring.xml`）
+在 `logback-spring.xml` 中，你可以针对不同的环境（`dev`、`prod`）使用 `<springProfile>`：
+```xml
+<springProfile name="dev">
+    <property name="LOG_FILE" value="./logs/dev.log"/>
+</springProfile>
+
+<springProfile name="prod">
+    <property name="LOG_FILE" value="./logs/prod.log"/>
+</springProfile>
+```
+如果 Spring Boot 运行时指定了 `spring.profiles.active=prod`，那么 `LOG_FILE` 就会使用 `./logs/prod.log`。
+
+⚠️ **这个功能在 `logback.xml` 里是无法使用的！**
+
+6. 结论
+
+**什么时候用 `logback.xml`？**
+✅ 你不需要从 **Spring Boot 配置** 里获取变量。  
+✅ 你的项目 **不是** Spring Boot 项目，而是普通 Java 项目。  
+✅ 你希望 Logback **尽早初始化**（比 Spring Boot 更早）。  
+
+**什么时候用 `logback-spring.xml`？**
+✅ 你想在 **`application.properties` 或 `application.yml` 里定义日志路径**。  
+✅ 你需要支持 **Spring Profile**，让不同环境使用不同的日志配置。  
+✅ 你希望 **日志系统在 Spring Boot 之后加载**，从而获取 Spring 配置。

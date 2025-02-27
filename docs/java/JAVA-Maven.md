@@ -1281,3 +1281,11 @@ test {
     useJUnitPlatform()
 }
 ```
+
+## Maven详细日志
+
+```sh
+mvn clean compile install -X
+# 或
+mvn clean compile install -e
+```

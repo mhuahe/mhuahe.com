@@ -132,6 +132,99 @@ del 文件路径 /S /Q
 Remove-Item -Recurse -Force 文件路径
 ```
 
+## curl
+
+> 要将 HTTP POST 请求转换为命令行调用，可以使用 `curl` 工具。`curl` 是一个常用的命令行工具，用于发送 HTTP 请求。以下是具体的命令：
+
+### 发送 POST 请求
+```bash
+curl -X POST \
+  http://127.0.0.1:9999/api6/common/all \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mac": "{{mac}}",
+    "cpukey": "{{cpukey}}",
+    "data": "02-26",
+    "rid": "90028",
+    "pkgname": "com.yby.v11.mercury.tv",
+    "pkgid": 1,
+    "sid": 41
+  }'
+```
+
+#### 参数说明
+- `-X POST`：指定请求方法为 POST。
+- `http://127.0.0.1:9999/api6/common/all`：目标 URL。
+- `-H "Content-Type: application/json"`：设置请求头，指定请求体为 JSON 格式。
+- `-d '{}'`：指定请求体数据（JSON 格式）。
+
+#### 替换动态参数
+如果 `mac` 和 `cpukey` 是动态参数，可以通过变量替换。例如，在 Bash 脚本中：
+
+```bash
+MAC="00:11:22:33:44:55"
+CPUKEY="abc123"
+
+curl -X POST \
+  http://127.0.0.1:9999/api6/common/all \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mac": "'"$MAC"'",
+    "cpukey": "'"$CPUKEY"'",
+    "data": "02-26",
+    "rid": "90028",
+    "pkgname": "com.yby.v11.mercury.tv",
+    "pkgid": 1,
+    "sid": 41
+  }'
+```
+
+---
+
+#### 保存响应到文件
+如果需要将接口的响应保存到文件，可以使用 `-o` 参数：
+```bash
+curl -X POST \
+  http://127.0.0.1:9999/api6/common/all \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mac": "{{mac}}",
+    "cpukey": "{{cpukey}}",
+    "data": "02-26",
+    "rid": "90028",
+    "pkgname": "com.yby.v11.mercury.tv",
+    "pkgid": 1,
+    "sid": 41
+  }' \
+  -o response.json
+```
+
+#### 调试模式
+如果需要查看详细的请求和响应信息，可以添加 `-v` 参数：
+```bash
+curl -v -X POST \
+  http://127.0.0.1:9999/api6/common/all \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mac": "{{mac}}",
+    "cpukey": "{{cpukey}}",
+    "data": "02-26",
+    "rid": "90028",
+    "pkgname": "com.yby.v11.mercury.tv",
+    "pkgid": 1,
+    "sid": 41
+  }'
+```
+
+#### Windows 下的注意事项
+在 Windows 的命令行中，JSON 数据需要使用双引号包裹，并且需要对双引号进行转义：
+```bash
+curl -X POST ^
+  http://127.0.0.1:9999/api6/common/all ^
+  -H "Content-Type: application/json" ^
+  -d "{\"mac\": \"{{mac}}\", \"cpukey\": \"{{cpukey}}\", \"data\": \"02-26\", \"rid\": \"90028\", \"pkgname\": \"com.yby.v11.mercury.tv\", \"pkgid\": 1, \"sid\": 41}"
+```
+
 ## docker
 
 ### 基本命令

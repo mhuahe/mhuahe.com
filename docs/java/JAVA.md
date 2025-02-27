@@ -95,6 +95,13 @@ springcloud服务
 
 CGLIB已经不维护了，建议使用ByteBuddy。
 
+### Tomcat
+
+Tomcat低版本(8.5.x以下)不会检验域名下划线。高版本不支持下划线，会400并报错
+```
+o.apache.coyote.http11.Http11Processor: The host [api6_test.00008888.cc] is not valid Note: further occurrences of request parsing errors will be logged at DEBUG level.
+```
+
 ---
 
 ## 基础知识点
@@ -178,6 +185,21 @@ LocalDate.minus()
 - ArrayList 底层数组，插入是什么顺序，取出就是什么顺序，**注意如果按索引插入，如插入3处，则本来的3及后面的都会后移一位索引**
 - Vector 同ArrayList，是ArrayList的安全集合
 - LinkedList 底层链表
+
+> 注意点1
+```java
+List<IdNameVo> list = new ArrayList<>();
+IdNameVo idNameVo = new IdNameVo();
+idNameVo.setId(1);
+idNameVo.setName("1");
+list.add(0, idNameVo);
+// new不会覆盖原有对象，不重新new会覆盖
+idNameVo = new IdNameVo();
+idNameVo.setId(2);
+idNameVo.setName("2");
+list.add(0, idNameVo);
+System.out.println("list = " + list);
+```
 
 #### Set
 
@@ -2201,6 +2223,44 @@ public void test() {
 - 使用 JDBC 事务界定时，您可以将多个 SQL 语句结合到一个事务中。
   JDBC 事务的一个缺点是事务的范围局限于一个数据库连接。一个 JDBC 事务不能跨越多个数据库。
 - JDBC定义了SavePoint接口，提供在一个更细粒度的事务控制机制。当设置了一个保存点后，可以rollback到该保存点处的状态，而不是rollback整个事务。
+
+## 语言工具
+
+### Hutool
+
+> 拼音工具-PinyinUtil。以下为Hutool支持的拼音库的pom坐标，你可以选择任意一个引入项目中，如果引入多个，Hutool会按照以上顺序选择第一个使用。
+
+```xml
+<dependency>
+	<groupId>io.github.biezhi</groupId>
+	<artifactId>TinyPinyin</artifactId>
+	<version>2.0.3.RELEASE</version>
+</dependency>
+```
+```xml
+<dependency>
+	<groupId>com.belerweb</groupId>
+	<artifactId>pinyin4j</artifactId>
+	<version>2.5.1</version>
+</dependency>
+```
+```xml
+<dependency>
+	<groupId>com.github.stuxuhai</groupId>
+	<artifactId>jpinyin</artifactId>
+	<version>1.1.8</version>
+</dependency>
+```
+
+### 简体繁体
+
+```xml
+<dependency>
+    <groupId>com.github.houbb</groupId>
+    <artifactId>opencc4j</artifactId>
+    <version>1.8.1</version>
+</dependency>
+```
 
 ## MinIO
 
