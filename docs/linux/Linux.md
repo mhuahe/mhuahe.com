@@ -115,6 +115,11 @@ $ ntpdate cn.pool.ntp.org
 $ cat /etc/redhat-release
 ```
 
+```shell
+# 查看历史命令
+$ history
+```
+
 ## Windows命令
 
 ### cmd 删除文件夹和子文件夹

@@ -482,6 +482,154 @@ public class JacksonConfig {
 }
 ```
 
+### StringFormat
+
+`String.format` 是 Java 中用于格式化字符串的方法，它的第一个参数是 **格式字符串**（format string），用于定义输出的格式。格式字符串中可以包含 **普通文本** 和 **格式说明符**（format specifiers），格式说明符以 `%` 开头，用于指定如何格式化后续的参数。
+
+---
+
+#### 格式字符串的结构
+
+格式字符串由以下部分组成：
+- **普通文本**：直接输出的文本。
+- **格式说明符**：以 `%` 开头，用于格式化参数。
+
+示例：
+
+```java
+String result = String.format("Hello, %s! Today is %tF.", "World", new Date());
+System.out.println(result);
+```
+
+输出：
+
+```
+Hello, World! Today is 2023-10-15.
+```
+
+- `"Hello, %s! Today is %tF."` 是格式字符串。
+- `%s` 和 `%tF` 是格式说明符。
+
+---
+
+#### 格式说明符的语法
+
+格式说明符的通用语法如下：
+
+```
+%[argument_index$][flags][width][.precision]conversion
+```
+
+参数说明：
+- **`argument_index$`**（可选）：指定使用第几个参数（从 1 开始）。例如，`1$` 表示第一个参数，`2$` 表示第二个参数。
+- **`flags`**（可选）：格式化标志，用于控制输出的对齐、填充等。
+- **`width`**（可选）：输出的最小宽度。
+- **`.precision`**（可选）：对于浮点数，表示小数位数；对于字符串，表示最大字符数。
+- **`conversion`**（必需）：转换类型，指定如何格式化参数。
+
+---
+
+#### 常用转换类型
+| 转换类型 | 说明                                                                 |
+|----------|----------------------------------------------------------------------|
+| `%s`     | 格式化字符串。                                                       |
+| `%d`     | 格式化整数（十进制）。                                               |
+| `%f`     | 格式化浮点数。                                                       |
+| `%t`     | 格式化日期/时间（需配合日期/时间转换符，如 `%tF`、`%tT` 等）。       |
+| `%b`     | 格式化布尔值（`true` 或 `false`）。                                  |
+| `%c`     | 格式化字符。                                                         |
+| `%x`     | 格式化整数（十六进制）。                                             |
+| `%o`     | 格式化整数（八进制）。                                               |
+| `%e`     | 格式化浮点数（科学计数法）。                                         |
+| `%n`     | 插入平台相关的换行符。                                               |
+| `%%`     | 插入百分号 `%`。                                                     |
+
+---
+
+#### 常用标志
+| 标志 | 说明                                                                 |
+|------|----------------------------------------------------------------------|
+| `-`  | 左对齐（默认右对齐）。                                               |
+| `0`  | 用零填充宽度。                                                       |
+| `+`  | 显示正数的符号（`+`）。                                              |
+| ` `  | 在正数前添加空格。                                                   |
+| `,`  | 使用千位分隔符（适用于数字）。                                       |
+| `(`  | 将负数用括号括起来。                                                 |
+
+---
+
+#### 示例
+
+##### 格式化字符串
+```java
+String name = "Alice";
+int age = 25;
+String result = String.format("Name: %s, Age: %d", name, age);
+System.out.println(result);
+```
+输出：
+```
+Name: Alice, Age: 25
+```
+
+##### 格式化浮点数
+```java
+double pi = Math.PI;
+String result = String.format("Pi: %.2f", pi);
+System.out.println(result);
+```
+输出：
+```
+Pi: 3.14
+```
+
+##### 格式化日期
+```java
+Date now = new Date();
+String result = String.format("Today is %tF, Time is %tT", now, now);
+System.out.println(result);
+```
+输出：
+```
+Today is 2023-10-15, Time is 14:30:45
+```
+
+##### 使用宽度和填充
+```java
+int number = 123;
+String result = String.format("Number: %08d", number);
+System.out.println(result);
+```
+输出：
+```
+Number: 00000123
+```
+
+##### 使用千位分隔符
+```java
+int population = 1234567;
+String result = String.format("Population: %,d", population);
+System.out.println(result);
+```
+输出：
+```
+Population: 1,234,567
+```
+
+---
+
+##### 日期/时间格式化
+`%t` 是日期/时间的转换类型，需要配合以下后缀使用：
+
+| 后缀 | 说明                             | 示例                |
+|------|----------------------------------|---------------------|
+| `F`  | ISO 8601 格式的日期（`yyyy-MM-dd`） | `2023-10-15`        |
+| `T`  | 24 小时制时间（`HH:mm:ss`）       | `14:30:45`          |
+| `D`  | 美国格式的日期（`MM/dd/yyyy`）    | `10/15/2023`        |
+| `r`  | 12 小时制时间（`hh:mm:ss AM/PM`） | `02:30:45 PM`       |
+| `c`  | 完整日期和时间                   | `Sun Oct 15 14:30:45 CST 2023` |
+
+
 ## JSqlParser
 
 > 依赖了JSqlParser

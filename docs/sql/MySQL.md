@@ -947,6 +947,18 @@ SELECT value1,MAX(value) FROM a GROUP BY a.value1
 
 ```
 
+### 数据库授权
+
+```mysql
+-- 查询当前用户权限
+SHOW GRANTS FOR CURRENT_USER();
+-- 查询指定用户权限
+SHOW GRANTS FOR 'root'@'%';
+-- 授予指定用户playback数据库权限
+GRANT ALL PRIVILEGES ON playback.* TO 'root'@'%';
+FLUSH PRIVILEGES;
+```
+
 
 ### binlog
 
