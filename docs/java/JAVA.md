@@ -2051,6 +2051,234 @@ execution(* com.macro.mall.tiny.service..*.*(..))
 execution(* com.macro.mall.tiny.service.PmsBrandService.*(..))
 ```
 
+### 获取请求体参数
+
+```java
+@Aspect
+@Component
+public class ApiLogAspect {
+    private static final Logger logger = LoggerFactory.getLogger(ApiLogAspect.class);
+
+    // 切入所有Controller方法
+    @Pointcut("execution(* com.example.api.controller..*.*(..))")
+    public void controllerPointcut() {
+    }
+
+    @Before("controllerPointcut()")
+    public void logRequest(JoinPoint joinPoint) {
+        try {
+            // 获取HttpServletRequest
+            HttpServletRequest request =
+                    ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+            // 获取请求体参数
+            String requestBody = getRequestBody(request);
+            logger.info("\n=== 请求信息 ===\nURL: {}\nMethod: {}\nParams: {}\nBody: {}",
+                    request.getRequestURI(),
+                    request.getMethod(),
+                    request.getParameterMap(),
+                    requestBody);
+
+            // 解析请求体中的domain字段（假设请求体是JSON格式）
+            if (ObjectUtil.isNotEmpty(requestBody)) {
+                Map<String, Object> bodyMap = JSONUtil.toBean(requestBody, Map.class);
+                String domain = Convert.toStr(bodyMap.get("domain"), "");
+                if (ObjectUtil.isNotEmpty(domain)) {
+                    ApiDomainContext.setApiDomain(domain);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("\n=== 请求信息 ===\n{}", e.getMessage());
+        }
+    }
+    /**
+     * 从HttpServletRequest中读取请求体内容
+     */
+    private String getRequestBody(HttpServletRequest request) throws IOException {
+        StringBuilder requestBody = new StringBuilder();
+        try (BufferedReader reader = request.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                requestBody.append(line);
+            }
+        }
+        return requestBody.toString();
+    }
+}
+```
+
+注意事项
+
+1. 请求体只能读取一次：HttpServletRequest 的输入流只能读取一次。如果需要多次读取请求体，可以将其缓存到请求属性中。
+2. 性能问题：频繁读取请求体可能会影响性能，建议在必要时使用。
+3. JSON 格式：代码假设请求体是 JSON 格式。如果请求体是其他格式（如表单数据），需要调整解析逻辑。
+
+错误：
+`getInputStream() has already been called for this request`
+原因：
+> 你遇到的错误是因为 `HttpServletRequest` 的输入流（`getInputStream()` 或 `getReader()`）**只能读取一次**。如果在其他地方（如 Spring 的 `@RequestBody` 注解）已经读取了请求体，再次调用 `getInputStream()` 或 `getReader()` 就会抛出异常。
+解决方案：
+
+方法一：**使用 `ContentCachingRequestWrapper`**
+
+> Spring 提供了 `ContentCachingRequestWrapper`，它可以缓存请求体的内容，允许多次读取。你可以在过滤器中将原始的 `HttpServletRequest` 包装为 `ContentCachingRequestWrapper`，然后在切面中使用它。
+
+1. **创建过滤器**：
+   在过滤器中包装请求对象。
+   ```java
+   import org.springframework.web.filter.OncePerRequestFilter;
+   import org.springframework.web.util.ContentCachingRequestWrapper;
+
+   import javax.servlet.FilterChain;
+   import javax.servlet.ServletException;
+   import javax.servlet.http.HttpServletRequest;
+   import javax.servlet.http.HttpServletResponse;
+   import java.io.IOException;
+
+   public class CachingRequestBodyFilter extends OncePerRequestFilter {
+       @Override
+       protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+               throws ServletException, IOException {
+           // 包装请求对象
+           ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
+           filterChain.doFilter(wrappedRequest, response);
+       }
+   }
+   ```
+
+2. **注册过滤器**：
+   在 Spring Boot 中注册过滤器。
+   ```java
+   import org.springframework.boot.web.servlet.FilterRegistrationBean;
+   import org.springframework.context.annotation.Bean;
+   import org.springframework.context.annotation.Configuration;
+
+   @Configuration
+   public class FilterConfig {
+       @Bean
+       public FilterRegistrationBean<CachingRequestBodyFilter> cachingRequestBodyFilter() {
+           FilterRegistrationBean<CachingRequestBodyFilter> registrationBean = new FilterRegistrationBean<>();
+           registrationBean.setFilter(new CachingRequestBodyFilter());
+           registrationBean.addUrlPatterns("/*"); // 过滤所有请求
+           return registrationBean;
+       }
+   }
+   ```
+
+3. **在切面中使用 `ContentCachingRequestWrapper`**：
+   修改切面代码，使用 `ContentCachingRequestWrapper` 获取请求体。
+   ```java
+   import org.aspectj.lang.JoinPoint;
+   import org.aspectj.lang.annotation.Aspect;
+   import org.aspectj.lang.annotation.Before;
+   import org.aspectj.lang.annotation.Pointcut;
+   import org.slf4j.Logger;
+   import org.slf4j.LoggerFactory;
+   import org.springframework.stereotype.Component;
+   import org.springframework.web.context.request.RequestContextHolder;
+   import org.springframework.web.context.request.ServletRequestAttributes;
+   import org.springframework.web.util.ContentCachingRequestWrapper;
+
+   import javax.servlet.http.HttpServletRequest;
+   import java.nio.charset.StandardCharsets;
+   import java.util.Map;
+
+   @Aspect
+   @Component
+   public class ApiLogAspect {
+       private static final Logger logger = LoggerFactory.getLogger(ApiLogAspect.class);
+
+       // 切入所有Controller方法
+       @Pointcut("execution(* com.example.api.controller..*.*(..))")
+       public void controllerPointcut() {
+       }
+
+       @Before("controllerPointcut()")
+       public void logRequest(JoinPoint joinPoint) {
+           try {
+               // 获取HttpServletRequest
+               HttpServletRequest request =
+                       ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+               // 检查是否是ContentCachingRequestWrapper
+               if (request instanceof ContentCachingRequestWrapper) {
+                   ContentCachingRequestWrapper wrappedRequest = (ContentCachingRequestWrapper) request;
+
+                   // 获取请求体
+                   String requestBody = new String(wrappedRequest.getContentAsByteArray(), StandardCharsets.UTF_8);
+                   logger.info("\n=== 请求信息 ===\nURL: {}\nMethod: {}\nParams: {}\nBody: {}",
+                           request.getRequestURI(),
+                           request.getMethod(),
+                           request.getParameterMap(),
+                           requestBody);
+
+                   // 解析请求体中的domain字段（假设请求体是JSON格式）
+                   if (ObjectUtil.isNotEmpty(requestBody)) {
+                       Map<String, Object> bodyMap = JSONUtil.toBean(requestBody, Map.class);
+                       String domain = Convert.toStr(bodyMap.get("domain"), "");
+                       if (ObjectUtil.isNotEmpty(domain)) {
+                           ApiDomainContext.setApiDomain(domain);
+                       }
+                   }
+               }
+           } catch (Exception e) {
+               logger.error("\n=== 请求信息 ===\n{}", e.getMessage());
+           }
+       }
+   }
+   ```
+
+方法二：**使用 `RequestContextHolder` 缓存请求体**
+
+> 如果不想使用过滤器，可以在控制器方法中手动缓存请求体，然后在切面中获取。
+
+1. **在控制器中缓存请求体**：
+   ```java
+   import org.springframework.web.bind.annotation.*;
+   import javax.servlet.http.HttpServletRequest;
+
+   @RestController
+   public class MyController {
+       @PostMapping("/example")
+       public String example(@RequestBody String requestBody, HttpServletRequest request) {
+           // 缓存请求体
+           request.setAttribute("cachedRequestBody", requestBody);
+           return "Success";
+       }
+   }
+   ```
+
+2. **在切面中获取缓存的请求体**：
+   ```java
+   @Before("controllerPointcut()")
+   public void logRequest(JoinPoint joinPoint) {
+       try {
+           // 获取HttpServletRequest
+           HttpServletRequest request =
+                   ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+           // 获取缓存的请求体
+           String requestBody = (String) request.getAttribute("cachedRequestBody");
+           if (ObjectUtil.isNotEmpty(requestBody)) {
+               logger.info("\n=== 请求信息 ===\nURL: {}\nMethod: {}\nParams: {}\nBody: {}",
+                       request.getRequestURI(),
+                       request.getMethod(),
+                       request.getParameterMap(),
+                       requestBody);
+
+               // 解析请求体中的domain字段
+               Map<String, Object> bodyMap = JSONUtil.toBean(requestBody, Map.class);
+               String domain = Convert.toStr(bodyMap.get("domain"), "");
+               if (ObjectUtil.isNotEmpty(domain)) {
+                   ApiDomainContext.setApiDomain(domain);
+               }
+           }
+       } catch (Exception e) {
+           logger.error("\n=== 请求信息 ===\n{}", e.getMessage());
+       }
+   }
+   ```
+
 ## 接口文档
 
 ### springfox

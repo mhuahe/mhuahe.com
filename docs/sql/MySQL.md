@@ -1298,6 +1298,18 @@ TIMESTAMP	YYYY-MM-DD HH:MM:SS	 1980-01-01 00:00:01 UTC ~ 2040-01-19 03:14:07 UTC
 
 ## 回表
 
+## 例子
+
+### 按字段长度排序
+
+> 判断某个字段的长度，比如我想让这个字段长度为3的数据排前面并按id倒序，其它数据的排后面按id进行倒序
+
+```mysql
+SELECT * FROM your_table
+ORDER BY 
+    CASE WHEN LENGTH(someField) = 3 THEN 0 ELSE 1 END,
+    id DESC;
+```
 
 ---
 
