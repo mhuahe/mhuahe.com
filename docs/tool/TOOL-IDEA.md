@@ -14,6 +14,7 @@ sidebar_position: 2
 - Statictic
 
 ### Dao工具
+- MyBatisCodeHelperPro
 - MybatisX
 - Free MyBatis plugin
 - Mybatis Log Plugin
@@ -338,6 +339,62 @@ log4j.appender.error.append=TRUE
 log4j.appender.error.ImmediateFlush=TRUE
 log4j.appender.error.File=${catalina.base}/logs/iptv5.log
 ```
+
+## IDEA将JavaSE代码打成jar包
+
+### 使用命令行工具
+
+**编译 Java 代码**
+
+确保你的 Java 代码已经编译为 `.class` 文件。如果还没有编译，可以使用以下命令：
+```bash
+javac YourClassName.java
+```
+这会生成 `YourClassName.class` 文件。
+
+**创建 JAR 包**
+使用 `jar` 命令将 `.class` 文件打包成 JAR 文件。假设你的项目结构如下：
+```
+project/
+├── YourClassName.class
+└── otherFiles.class
+```
+
+在项目根目录下运行以下命令：
+
+```bash
+jar cf YourJarName.jar *.class
+```
+- `c`：创建新的 JAR 文件。
+- `f`：指定 JAR 文件名。
+- `*.class`：将所有 `.class` 文件打包。
+
+**指定主类（可选）**
+
+如果你的 JAR 包需要指定主类（即程序入口），可以创建一个 `MANIFEST.MF` 文件：
+```
+Main-Class: YourClassName
+```
+
+然后将 `MANIFEST.MF` 文件打包到 JAR 中：
+
+```bash
+jar cfm YourJarName.jar MANIFEST.MF *.class
+```
+- `m`：指定清单文件（`MANIFEST.MF`）。
+
+**运行 JAR 包**
+使用以下命令运行 JAR 包：
+```bash
+java -Dfile.encoding=UTF-8 -jar YourJarName.jar
+```
+
+### 使用 IDEA
+
+- 打开项目，点击菜单栏的 `File > Project Structure`。
+- 选择 `Artifacts`，点击 `+` 号，选择 `JAR > From modules with dependencies`。
+- 选择主类（Main Class），然后点击 `OK`。
+- 点击 `Build > Build Artifacts`，选择 `Build` 即可生成 JAR 包。
 
 ## QAPlug
 

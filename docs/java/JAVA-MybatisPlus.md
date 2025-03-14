@@ -17,6 +17,48 @@
  </select>
 ```
 
+### mybatis.typeAliasesPackage
+
+`mybatis.typeAliasesPackage` 是 MyBatis 配置中的一个属性，主要用于简化全限定类名的书写，通过为指定包下的所有实体类创建别名。这使得在映射文件（如 XML 映射文件）或注解中引用这些实体类时更加简洁方便。
+
+#### 作用
+
+当你配置了 `mybatis.typeAliasesPackage` 属性后，MyBatis 会自动扫描该包及其子包下的所有类，并将其短类名（即不包含包名的类名）作为别名注册到 MyBatis 的类型别名机制中。这意味着你可以在不需要使用完整的类路径的情况下引用这些类，从而减少代码量并提高可读性。
+
+例如，如果你有一个实体类 `com.example.model.User`，设置了 `typeAliasesPackage=com.example.model` 后，你就可以直接使用 `"User"` 来代替 `"com.example.model.User"`。
+
+#### 使用场景
+
+如果没有设置 `typeAliasesPackage`，在 MyBatis 映射文件中你需要这样引用实体类：
+
+```xml
+<resultMap id="userResultMap" type="com.example.model.User">
+    <!-- 结果映射配置 -->
+</resultMap>
+```
+
+但是，一旦设置了 `typeAliasesPackage="com.example.model"`，你可以简化为：
+
+```xml
+<resultMap id="userResultMap" type="User">
+    <!-- 结果映射配置 -->
+</resultMap>
+```
+
+#### 注意事项
+
+1. **区分大小写**：默认情况下，MyBatis 对类型别名是区分大小写的。也就是说，如果实体类名为 `User`，则别名为 `"User"` 而不是 `"user"`。
+   
+2. **覆盖默认别名**：如果需要自定义某个类的别名，而不是使用默认的短类名，可以使用 `<typeAlias>` 标签单独定义。例如：
+
+   ```xml
+   <typeAliases>
+       <typeAlias alias="UserEntity" type="com.example.model.User"/>
+   </typeAliases>
+   ```
+
+3. **性能考虑**：虽然使用类型别名可以使代码更简洁，但在某些情况下，过度依赖别名可能会导致混淆或错误。因此，在大型项目中合理规划和管理别名是非常重要的。
+
 ## 快速测试
 
 

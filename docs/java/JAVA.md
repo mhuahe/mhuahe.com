@@ -106,6 +106,12 @@ o.apache.coyote.http11.Http11Processor: The host [api6_test.00008888.cc] is not 
 
 ## 基础知识点
 
+### 优化
+
+- 多线程
+- 减少IO操作
+- 减少嵌套循环
+
 ### 多态
 
 ```sql
@@ -1059,6 +1065,125 @@ Files.write(Path.of("/path/to/file.txt"), lines);
 
 最后需要特别注意的是，`Files`提供的读写方法，受内存限制，只能读写小文件，例如配置文件等，不可一次读入几个G的大文件。读写大型文件仍然要使用文件流，每次只读写一部分文件内容。
 
+### 读取本地文件内容
+
+```java
+import java.io.*;
+
+public class FileReaderExample {
+
+    public static void main(String[] args) {
+        // 定义文件路径
+        String filePath = "src/readme.txt";
+
+        // 使用 try-with-resources 确保资源被正确关闭
+        try (Reader reader = new InputStreamReader(new FileInputStream(filePath), "UTF-8");
+             BufferedReader bufferedReader = new BufferedReader(reader)) {
+
+            // 逐行读取文件内容
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                // 打印每一行内容
+                System.out.println(line);
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("不支持的编码格式: " + e.getMessage());
+        } catch (FileNotFoundException e) {
+            System.err.println("找不到指定的文件: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("读取文件时发生错误: " + e.getMessage());
+        }
+    }
+}
+```
+
+### 读取URL文件内容
+
+要从一个URL读取文件内容，而不是本地文件系统中的文件，你需要使用Java中的`HttpURLConnection`或更现代的`java.net.http.HttpClient`（适用于Java 11及以上版本）。这里，我将展示如何使用这两种方法来读取指定URL的内容。
+
+- `HttpURLConnection`
+
+对于较老版本的Java或者如果你偏好使用传统的`HttpURLConnection`类，可以这样做：
+
+```java
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class HttpUrlConnectionExample {
+
+    public static void main(String[] args) {
+        String url = "https://quartz688.cc//data//1_2025-03-13.txt";
+        
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+            
+            // 设置请求属性
+            connection.setRequestMethod("GET");
+            
+            // 获取响应码
+            int responseCode = connection.getResponseCode();
+            System.out.println("GET Response Code :: " + responseCode);
+            
+            if (responseCode == HttpURLConnection.HTTP_OK) { // success
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                // 打印结果
+                System.out.println(response.toString());
+            } else {
+                System.out.println("GET request not worked");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+- 使用 `HttpClient`（Java 11及以上）
+
+对于Java 11及更高版本，推荐使用`java.net.http.HttpClient`，因为它提供了更加现代化和易用的API：
+
+```java
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.io.IOException;
+
+public class HttpClientExample {
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        String url = "https://quartz688.cc//data//1_2025-03-13.txt";
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // 检查响应状态码
+        if (response.statusCode() == 200) {
+            // 成功获取内容
+            System.out.println(response.body());
+        } else {
+            System.out.println("Failed to fetch the content. Status code: " + response.statusCode());
+        }
+    }
+}
+```
+
 ---
 
 ## stream
@@ -1528,6 +1653,100 @@ public class Main {
     static <T> T[] asArray(T... objs) {
         return objs;
     }
+}
+```
+
+示例一：解析字符串，格式: "key1=value1,key2=value2"
+
+```java
+public static <T> T parseKey(String deKey, Class<T> clazz) {
+    T instance = null;
+    try {
+        // 创建对象（带默认值）
+        instance = clazz.getDeclaredConstructor().newInstance();
+        String[] keyArray = deKey.split(",");
+        for (String map : keyArray) {
+            // 限制 split 次数，避免异常
+            String[] keyValue = map.split("=", 2);
+            // 跳过不合法的键值对
+            if (keyValue.length < 2) {
+                continue;
+            }
+            String fieldName = keyValue[0].trim();
+            String fieldValue = keyValue[1].trim();
+
+            if (fieldValue.isEmpty() || "null".equalsIgnoreCase(fieldValue)) {
+                // 传入的是空值或 "null"，不修改默认值
+                continue;
+            }
+            // 递归查找字段（包括父类）
+            Field field = findField(clazz, fieldName);
+            if (field != null) {
+                field.setAccessible(true);
+                // 获取字段类型并进行转换
+                field.set(instance, convertType(field.getType(), fieldValue));
+            } else {
+                logger.warn("Field '{}' not found in class {}", fieldName, clazz.getName());
+            }
+        }
+    } catch (Exception e) {
+        logger.info("Failed to parse key: {}", deKey, e);
+    }
+    return instance;
+}
+private static Field findField(Class<?> clazz, String fieldName) {
+    try {
+        // 尝试获取当前类的字段
+        return clazz.getDeclaredField(fieldName);
+    } catch (NoSuchFieldException e) {
+        // 如果当前类没有该字段，尝试从父类查找
+        Class<?> superClass = clazz.getSuperclass();
+        if (superClass != null) {
+            return findField(superClass, fieldName);
+        }
+        // 如果父类也没有，返回 null
+        return null;
+    }
+}
+```
+
+示例二：拼接字段 "field1=1,field2=2"
+
+```java
+/**
+ * 不需要获取继承父类字段的情况下
+ */
+public static String objectToStringNoExtends(Object obj) {
+    return Arrays.stream(obj.getClass().getDeclaredFields())
+            .peek(field -> field.setAccessible(true))
+            .map(field -> {
+                try {
+                    return field.getName() + "=" + field.get(obj);
+                } catch (IllegalAccessException e) {
+                    return field.getName() + "=";
+                }
+            })
+            .collect(Collectors.joining(","));
+}
+/**
+ * 获取继承父类字段的情况下
+ */
+public static String objectToString(Object obj) {
+    Class<?> clazz = obj.getClass();
+    List<String> fieldValues = new ArrayList<>();
+
+    while (clazz != null) {
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                fieldValues.add(field.getName() + "=" + field.get(obj));
+            } catch (IllegalAccessException e) {
+                fieldValues.add(field.getName() + "=");
+            }
+        }
+        clazz = clazz.getSuperclass();
+    }
+    return String.join(",", fieldValues);
 }
 ```
 
