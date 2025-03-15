@@ -1313,6 +1313,185 @@ ORDER BY
 
 ---
 
+## 字符集问题
+
+> 数据库觉得 Hành 和 hanh 相等
+
+是的，这个问题很可能与数据库的 **字符集（Character Set）** 和 **排序规则（Collation）** 有关。MySQL 的排序规则决定了字符串比较和排序的行为，某些排序规则会忽略大小写或特定字符的差异（例如 `Hành` 和 `hanh` 被视为相等）。
+
+1. **问题原因**
+- 如果数据库的排序规则是 **不区分大小写** 或 **不区分重音符号** 的，那么 `Hành` 和 `hanh` 可能会被视为相等。
+- 例如，`utf8mb4_general_ci` 是一种常见的排序规则，它会忽略大小写和某些重音符号的差异。
+
+2. **验证排序规则**
+运行以下 SQL 查询，检查表的字符集和排序规则：
+```sql
+SHOW TABLE STATUS WHERE Name = 'vod_content';
+```
+
+查看 `Collation` 字段的值。常见的排序规则包括：
+- `utf8mb4_general_ci`：不区分大小写，不区分某些重音符号。
+- `utf8mb4_bin`：区分大小写，区分所有字符。
+
+3. **验证字符比较行为**
+运行以下 SQL 查询，验证 `Hành` 和 `hanh` 是否被视为相等：
+```sql
+SELECT 'Hành' = 'hanh' COLLATE utf8mb4_general_ci; -- 返回 1（相等）
+SELECT 'Hành' = 'hanh' COLLATE utf8mb4_bin;       -- 返回 0（不相等）
+```
+
+如果使用 `utf8mb4_general_ci`，`Hành` 和 `hanh` 会被视为相等。
+
+4. **解决方案**
+
+- **修改排序规则**
+
+将表的排序规则改为区分大小写和重音符号的规则（如 `utf8mb4_bin`）：
+```sql
+ALTER TABLE vod_content 
+CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+```
+
+- **在查询中指定排序规则**
+
+如果不想修改表的排序规则，可以在查询中临时指定排序规则：
+```sql
+SELECT *
+FROM vod_content
+WHERE
+  STATUS = 0
+  AND (
+    v_name LIKE CONCAT('%', 'Hành', '%') COLLATE utf8mb4_bin
+    OR showname LIKE CONCAT('%', 'Hành', '%') COLLATE utf8mb4_bin
+    OR alsocalled LIKE CONCAT('%', 'Hành', '%') COLLATE utf8mb4_bin
+    OR keyword LIKE CONCAT('%', 'Hnh', '%') COLLATE utf8mb4_bin
+  )
+ORDER BY
+  GREATEST(
+    CASE WHEN v_name LIKE CONCAT('%', 'Hành', '%') COLLATE utf8mb4_bin THEN 4 ELSE 0 END,
+    CASE WHEN showname LIKE CONCAT('%', 'Hành', '%') COLLATE utf8mb4_bin THEN 3 ELSE 0 END,
+    CASE WHEN alsocalled LIKE CONCAT('%', 'Hành', '%') COLLATE utf8mb4_bin THEN 2 ELSE 0 END,
+    CASE WHEN keyword LIKE CONCAT('%', 'Hnh', '%') COLLATE utf8mb4_bin THEN 1 ELSE 0 END
+  ) DESC,
+  v_id DESC
+LIMIT 100;
+```
+
+5. **排序规则对比**
+
+| 排序规则             | 是否区分大小写 | 是否区分重音符号 | 示例（`Hành` vs `hanh`） |
+|----------------------|----------------|------------------|--------------------------|
+| `utf8mb4_general_ci` | 不区分         | 不区分           | 相等                     |
+| `utf8mb4_bin`        | 区分           | 区分             | 不相等                   |
+
+6. **注意事项**
+- **修改排序规则的影响**：
+  - 修改表的排序规则会影响所有查询和索引。
+  - 如果表中已有数据，修改排序规则可能会导致索引重建，耗时较长。
+- **性能问题**：
+  - `utf8mb4_bin` 的性能通常优于 `utf8mb4_general_ci`，因为它不需要处理复杂的字符比较规则。
+- **兼容性问题**：
+  - 确保应用程序和其他查询能够正确处理区分大小写和重音符号的排序规则。
+
+---
+
+## 排序权重
+
+如果使用权重后的 SQL 语句没有达到预期的排序效果，可能是以下原因导致的：
+
+---
+
+1. **权重分配问题**
+在你的 SQL 语句中，`v_name` 和 `showname` 的权重都是 3，这可能导致它们的排序优先级相同，无法区分哪个字段的匹配更重要。
+
+解决方案：
+调整权重值，确保每个字段的优先级不同。例如：
+- `v_name` 匹配成功：权重为 4（最高优先级）。
+- `showname` 匹配成功：权重为 3。
+- `alsocalled` 匹配成功：权重为 2。
+- `keyword` 匹配成功：权重为 1。
+  
+1. **多个字段匹配时的权重计算问题**
+如果一条记录同时匹配了多个字段（例如 `v_name` 和 `showname`），当前的 `CASE` 语句只会取第一个匹配的权重值，而不是最高权重值。
+
+#### 解决方案：
+使用 `GREATEST` 函数计算多个字段匹配时的最高权重值。
+
+3. **SQL 语句优化**
+以下是优化后的 SQL 语句，解决了上述问题：
+
+```sql
+SELECT
+  v_id, v_name, showname, keyword, alsocalled
+FROM
+  vod_content
+WHERE
+  STATUS = 0
+  AND (
+    v_name LIKE CONCAT('%', 'Hành', '%')
+    OR showname LIKE CONCAT('%', 'Hành', '%')
+    OR alsocalled LIKE CONCAT('%', 'Hành', '%')
+    OR keyword LIKE CONCAT('%', 'Hnh', '%')
+  )
+ORDER BY
+  GREATEST(
+    CASE WHEN v_name LIKE CONCAT('%', 'Hành', '%') THEN 4 ELSE 0 END,
+    CASE WHEN showname LIKE CONCAT('%', 'Hành', '%') THEN 3 ELSE 0 END,
+    CASE WHEN alsocalled LIKE CONCAT('%', 'Hành', '%') THEN 2 ELSE 0 END,
+    CASE WHEN keyword LIKE CONCAT('%', 'Hnh', '%') THEN 1 ELSE 0 END
+  ) DESC,
+  v_id DESC
+LIMIT 100;
+```
+
+优化点详解
+
+1. **权重分配**：
+   - `v_name` 匹配成功：权重为 4。
+   - `showname` 匹配成功：权重为 3。
+   - `alsocalled` 匹配成功：权重为 2。
+   - `keyword` 匹配成功：权重为 1。
+
+2. **`GREATEST` 函数**：
+   - 计算多个字段匹配时的最高权重值。
+   - 例如，如果一条记录同时匹配了 `v_name` 和 `showname`，则取最高权重值 4。
+
+3. **排序规则**：
+   - 先按最高权重值降序排列。
+   - 如果权重值相同，则按 `v_id` 降序排列。
+
+示例数据
+
+假设有以下数据：
+
+| v_id | v_name       | showname     | alsocalled   | keyword   |
+|------|--------------|--------------|--------------|-----------|
+| 1    | Hành Động    | Action Movie | Hành         | Hnh       |
+| 2    | Movie        | Hành Động    | Action       | Hnh       |
+| 3    | Action       | Movie        | Hành Động    | Hnh       |
+| 4    | Hành         | Action       | Movie        | Hnh       |
+
+查询结果：
+1. `v_id = 1`：`v_name` 匹配成功，权重为 4。
+2. `v_id = 2`：`showname` 匹配成功，权重为 3。
+3. `v_id = 4`：`alsocalled` 匹配成功，权重为 2。
+4. `v_id = 3`：`keyword` 匹配成功，权重为 1。
+
+---
+
+注意事项
+
+1. **性能问题**：
+   - `LIKE` 查询和 `CASE` 语句可能会导致查询性能下降，尤其是在数据量较大时。
+   - 如果性能成为瓶颈，可以考虑使用全文索引（如 MySQL 的 `FULLTEXT` 索引）来优化 `LIKE` 查询。
+
+2. **权重值调整**：
+   - 根据实际需求调整权重值，确保排序规则符合业务逻辑。
+
+3. **参数绑定**：
+   - 在实际代码中，使用预编译语句（PreparedStatement）绑定参数，避免 SQL 注入风险。
+
+---
 
 ## LeetCode
 
