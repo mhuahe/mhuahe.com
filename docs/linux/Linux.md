@@ -120,6 +120,26 @@ $ cat /etc/redhat-release
 $ history
 ```
 
+### 目录下文件数量
+
+```shell
+ls -l | grep "^-" | wc -l
+# find 命令
+find 目录路径 -type f | wc -l
+# 排除隐藏文件
+find . -path '*/.*' -prune -o -type f -print | wc -l
+```
+
+```shell
+find . -type f -name '*_999.txt' | wc -l
+
+# 不递归子类
+find . -maxdepth 1 -type f -name '*_999.txt' | wc -l
+```
+- `find .`：从当前目录开始查找。. 表示当前目录。
+- `type f`：指定只查找文件（不包括目录）。
+- `name '*_999.txt'`：指定要查找的文件名模式，这里使用通配符 * 来匹配任何以 _999.txt 结尾的文件名。
+- `| wc -l`：将 find 命令的结果通过管道传递给 wc -l，用于计算匹配到的文件行数，每行对应一个文件。
 ## Windows命令
 
 ### cmd 删除文件夹和子文件夹
