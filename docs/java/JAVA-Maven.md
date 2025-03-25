@@ -323,7 +323,7 @@ import mavenInheritanceAndAggregation from '/img/docs/java/maven/Maven-继承和
 
 ## Maven依赖传递
 
-- 父 POM 继承 (`<parent>`)：当你在一个模块中使用 <parent> 标签时，该模块直接继承了父模块的 POM 配置，包括依赖管理、插件管理、属性等。
+- 父 POM 继承 (`<parent>`)：当你在一个模块中使用 `<parent>` 标签时，该模块直接继承了父模块的 POM 配置，包括依赖管理、插件管理、属性等。
 - 依赖 (`<dependency>`)：当你在一个模块中声明对另一个模块的依赖时，你只是引入了那个模块作为依赖项，并不会自动继承那个模块的父 POM。
 
 ### `<scope>`元素
