@@ -1184,6 +1184,332 @@ public class HttpClientExample {
 }
 ```
 
+### 读取xml
+
+#### DOM解析
+
+```java
+public static String downloadXml() {
+    String epgData = "";
+    try {
+        // 创建一个URL对象
+        URL url = new URL(EpgBestXmlConstant.EPG_URL);
+        // 获取URL连接，open方法返回一个URLConnection类的对象
+        URLConnection conn = url.openConnection();
+        // 伪装成浏览器访问
+        conn.addRequestProperty(EpgBestXmlConstant.USER_AGENT, EpgBestXmlConstant.USER_AGENT_VALUE);
+        // conn.setConnectTimeout(15000);//设置连接主机超时(单位：毫秒)
+        // conn.setReadTimeout(60000);//设置从主机读取数据超时(单位：毫秒)
+        StringBuilder sb = new StringBuilder();
+        try (final InputStream inStream = conn.getInputStream();
+                final GZIPInputStream gzip = new GZIPInputStream(inStream);
+                final InputStreamReader reader = new InputStreamReader(gzip);
+                final BufferedReader in = new BufferedReader(reader);) {
+
+            sb = new StringBuilder();
+            String read;
+            while ((read = in.readLine()) != null) {
+                sb.append(read);
+            }
+        } catch (IOException e) {
+            log.error("「downloadXml」「读取xml」失败", e);
+        }
+        log.info(">>>>>>>>");
+        epgData = sb.toString();
+    } catch (Exception e) {
+        log.error("「downloadXml」失败", e);
+    }
+    return epgData;
+}
+
+/**
+ * xml数据处理
+ */
+public static void domXml(String epgData, Map<String, List<ProgrammeBean>> ppBeanListMap) {
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    try {
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document document = db.parse(new InputSource(new ByteArrayInputStream(epgData.getBytes(StandardCharsets.UTF_8))));
+        // programme节点集
+        NodeList proList = document.getElementsByTagName("programme");
+        for (int i = 0; i < proList.getLength(); i++) {
+            // 每个programme对象
+            Node proBean = proList.item(i);
+            String startTime = proBean.getAttributes().getNamedItem("start").getTextContent();
+            String stopTime = proBean.getAttributes().getNamedItem("stop").getTextContent();
+            //*****当开始时间与结束时间一样时，跳过
+            if (startTime.equals(stopTime)) {
+                continue;
+            }
+            // 实例化本地存储对象
+            ProgrammeBean ppBean = new ProgrammeBean();
+            ppBean.setName(proBean.getAttributes().getNamedItem("channel").getTextContent());
+            ppBean.setStart(DateUtils.covertDate(startTime));
+            ppBean.setStop(DateUtils.covertDate(stopTime));
+            // programme对象下的子节点
+            NodeList childNodes = proBean.getChildNodes();
+            for (int k = 0; k < childNodes.getLength(); k++) {
+                if (childNodes.item(k).getNodeType() == Node.ELEMENT_NODE) {
+                    if ("title".equals(childNodes.item(k).getNodeName())) {
+                        ppBean.setTitle(childNodes.item(k).getTextContent());
+                    } else if ("desc".equals(childNodes.item(k).getNodeName())) {
+                        ppBean.setDesc(childNodes.item(k).getTextContent());
+                    } else if ("category".equals(childNodes.item(k).getNodeName())) {
+                        ppBean.setCategory(childNodes.item(k).getTextContent());
+                    } else if ("icon".equals(childNodes.item(k).getNodeName())) {
+                        ppBean.setIcon(childNodes.item(k).getAttributes().getNamedItem("src").getTextContent());
+                    } else if ("sub-title".equals(childNodes.item(k).getNodeName())) {
+                        ppBean.setSub_title(childNodes.item(k).getTextContent());
+                    } else if ("episode-num".equals(childNodes.item(k).getNodeName())) {
+                        ppBean.setEpisode_num(childNodes.item(k).getTextContent());
+                    }
+                }
+            }
+            // 填充Map对象
+            ppBeanListMap.computeIfAbsent(ppBean.getName(), k -> new ArrayList<>());
+            ppBeanListMap.get(ppBean.getName()).add(ppBean);
+        }
+    } catch (Exception e) {
+        log.error("「domXml」「解析xml」失败", e);
+    }
+}
+```
+
+#### StAX解析
+
+```java
+public static void downloadXml(Map<String, List<ProgrammeBean>> ppBeanListMap) {
+    try {
+        URL url = new URL(EpgBestXmlConstant.EPG_URL);
+        URLConnection conn = url.openConnection();
+        conn.addRequestProperty(EpgBestXmlConstant.USER_AGENT, EpgBestXmlConstant.USER_AGENT_VALUE);
+        // 使用临时文件存储
+        File tempFile = File.createTempFile("epg", ".xml");
+        try (InputStream inStream = conn.getInputStream()) {
+            // 直接解析流
+            log.info("-->parse xml start...");
+            domXml(inStream, ppBeanListMap);
+            log.info("-->parse xml finish...");
+        }
+        // 如果需要返回String，可以这样读取（但大文件仍可能有问题）
+        Files.readAllBytes(tempFile.toPath());
+    } catch (Exception e) {
+        log.error("「downloadXml」失败", e);
+    }
+}
+
+public static void domXml(InputStream inputStream, Map<String, List<ProgrammeBean>> ppBeanListMap) {
+    try {
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        XMLStreamReader reader = factory.createXMLStreamReader(new GZIPInputStream(inputStream));
+        // 临时存储当前节目的数据
+        ProgrammeBean currentProgramme = null;
+        // 记录当前处理的节点名（如title、desc）
+        String currentElement = "";
+
+        while (reader.hasNext()) {
+            // 获取下一个事件类型
+            int eventType = reader.next();
+
+            switch (eventType) {
+                // 开始标签（如<programme>）
+                case XMLStreamReader.START_ELEMENT:
+                    currentElement = reader.getLocalName();
+                    if ("programme".equals(currentElement)) {
+                        currentProgramme = new ProgrammeBean();
+                        // 解析programme属性
+                        String channel = reader.getAttributeValue(null, "channel");
+                        String start = reader.getAttributeValue(null, "start");
+                        String stop = reader.getAttributeValue(null, "stop");
+                        if (start.equals(stop)) {
+                            // 跳过无效数据
+                            currentProgramme = null;
+                            break;
+                        }
+                        currentProgramme.setName(channel);
+                        currentProgramme.setStart(DateUtils.covertDate(start));
+                        currentProgramme.setStop(DateUtils.covertDate(stop));
+                    } else if ("icon".equals(currentElement) && currentProgramme != null) {
+                        // 特殊处理icon的src属性
+                        String src = reader.getAttributeValue(null, "src");
+                        currentProgramme.setIcon(src);
+                    }
+                    break;
+                // 文本内容（如<title>新闻联播</title>中的"新闻联播"）
+                case XMLStreamReader.CHARACTERS:
+                    if (currentProgramme == null) {
+                        break;
+                    }
+                    if (currentElement == null) {
+                        break;
+                    }
+                    String text = reader.getText().trim();
+                    if (text.isEmpty()) {
+                        break;
+                    }
+                    switch (currentElement) {
+                        case "title":
+                            currentProgramme.setTitle(text);
+                            break;
+                        case "desc":
+                            currentProgramme.setDesc(text);
+                            break;
+                        case "category":
+                            currentProgramme.setCategory(text);
+                            break;
+                        case "sub-title":
+                            currentProgramme.setSub_title(text);
+                            break;
+                        case "episode-num":
+                            currentProgramme.setEpisode_num(text);
+                            break;
+                    }
+                    break;
+                // 结束标签（如</programme>）
+                case XMLStreamReader.END_ELEMENT:
+                    if ("programme".equals(reader.getLocalName()) && currentProgramme != null) {
+                        // 添加到Map
+                        ppBeanListMap.computeIfAbsent(
+                                currentProgramme.getName(),
+                                k -> new ArrayList<>()
+                        ).add(currentProgramme);
+                        currentProgramme = null;
+                    }
+                    currentElement = null;
+                    break;
+            }
+        }
+    } catch (Exception e) {
+        log.error("「parseXmlFromStream」解析失败", e);
+    }
+}
+```
+
+以下是这段 **StAX（Streaming API for XML）解析代码** 的详细解析，从**执行流程**、**关键设计**到**优化点**逐步说明：
+
+**1. 代码核心目标**
+- **直接解析GZIP压缩的XML流**，避免将整个XML加载到内存（解决`OutOfMemoryError`）。
+- 提取`<programme>`节点的属性（如`channel`、`start`、`stop`）和子节点（如`title`、`desc`等），填充到`ProgrammeBean`对象中。
+- 按`channel`分组存储到`Map<String, List<ProgrammeBean>>`。
+
+---
+
+**2. 关键组件**
+| 组件                   | 作用                                                                 |
+|------------------------|----------------------------------------------------------------------|
+| `XMLStreamReader`      | StAX解析器核心类，以流式方式逐节点读取XML。                          |
+| `GZIPInputStream`      | 自动解压GZIP压缩的输入流。                                           |
+| `ProgrammeBean`        | 存储单个节目的数据模型（如标题、时间、描述等）。                      |
+| `ppBeanListMap`        | 按频道名分组的节目列表，结构：`Map<频道名, List<ProgrammeBean>>`。    |
+
+**3. 执行流程分步解析**
+
+**步骤1：初始化解析器**
+```java
+XMLInputFactory factory = XMLInputFactory.newInstance();
+XMLStreamReader reader = factory.createXMLStreamReader(new GZIPInputStream(inputStream));
+```
+- 创建`XMLStreamReader`，绑定到解压后的输入流。
+- **注意**：StAX是“拉模式”解析器（由代码主动控制读取进度，不同于SAX的“推模式”）。
+
+**步骤2：逐节点解析**
+通过`while (reader.hasNext())`循环处理每个XML事件：
+```java
+int eventType = reader.next(); // 获取下一个事件类型
+```
+- **事件类型**：
+  - `START_ELEMENT`：开始标签（如`<programme>`）。
+  - `CHARACTERS`：文本内容（如`<title>新闻联播</title>`中的"新闻联播"）。
+  - `END_ELEMENT`：结束标签（如`</programme>`）。
+
+**步骤3：处理`<programme>`节点**
+当遇到`START_ELEMENT`且标签名为`programme`时：
+```java
+if ("programme".equals(currentElement)) {
+    currentProgramme = new ProgrammeBean();
+    String channel = reader.getAttributeValue(null, "channel");
+    String start = reader.getAttributeValue(null, "start");
+    String stop = reader.getAttributeValue(null, "stop");
+
+    if (start.equals(stop)) {
+        currentProgramme = null; // 跳过无效数据
+        break;
+    }
+    currentProgramme.setName(channel);
+    currentProgramme.setStart(DateUtils.covertDate(start));
+    currentProgramme.setStop(DateUtils.covertDate(stop));
+}
+```
+- **关键操作**：
+  1. 创建`ProgrammeBean`实例。
+  2. 从属性中提取`channel`、`start`、`stop`。
+  3. 若`start == stop`，跳过该节目（`currentProgramme = null`）。
+
+**步骤4：处理子节点（如`<title>`、`<desc>`）**
+在`CHARACTERS`事件中，根据当前节点名（`currentElement`）填充数据：
+```java
+String text = reader.getText().trim();
+if (text.isEmpty()) break;
+
+switch (currentElement) {
+    case "title":
+        currentProgramme.setTitle(text);
+        break;
+    case "desc":
+        currentProgramme.setDesc(text);
+        break;
+    // ...其他子节点处理
+}
+```
+- **为什么用`CHARACTERS`事件？**  
+  XML中文本内容（如`<title>文本</title>`）通过`CHARACTERS`事件触发。
+
+**步骤5：处理`<icon>`节点**
+`<icon>`需要特殊处理，因为它的值在属性`src`中：
+```java
+else if ("icon".equals(currentElement) && currentProgramme != null) {
+    String src = reader.getAttributeValue(null, "src");
+    currentProgramme.setIcon(src);
+}
+```
+
+**步骤6：保存完成的`ProgrammeBean`**
+当遇到`</programme>`结束标签时，将对象存入Map：
+```java
+if ("programme".equals(reader.getLocalName()) && currentProgramme != null) {
+    ppBeanListMap.computeIfAbsent(
+        currentProgramme.getName(), 
+        k -> new ArrayList<>()
+    ).add(currentProgramme);
+    currentProgramme = null; // 重置当前节目
+}
+```
+- **`computeIfAbsent`作用**：  
+  如果`channel`不存在，自动创建`ArrayList`；否则直接获取现有List。
+
+**4. 关键设计技巧**
+1. **状态跟踪**  
+   - `currentProgramme`：临时存储当前节目的数据。  
+   - `currentElement`：记录当前处理的节点名（如`title`、`desc`）。
+
+2. **懒加载**  
+   仅在遇到有效`<programme>`时创建`ProgrammeBean`，无效数据（如`start == stop`）直接跳过。
+
+3. **内存优化**  
+   - 流式解析不依赖DOM树，内存占用恒定（与XML大小无关）。
+   - 及时释放已完成的对象（`currentProgramme = null`）。
+
+**5. 异常处理**
+- 捕获所有异常并日志记录（`log.error`），避免程序中断。
+- 使用`try-with-resources`确保流自动关闭（在调用方处理）。
+
+**6. 性能对比（原DOM vs StAX）**
+| 指标                | DOM解析                          | StAX解析（本代码）               |
+|---------------------|----------------------------------|----------------------------------|
+| 内存占用            | 高（整个XML加载到内存）           | 低（仅缓存当前节点数据）          |
+| 速度                | 慢（需构建DOM树）                 | 快（直接流式读取）                |
+| 适用场景            | 小文件或需要频繁随机访问          | 大文件或顺序处理                  |
+
 ---
 
 ## stream
