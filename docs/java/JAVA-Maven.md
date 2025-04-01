@@ -602,6 +602,79 @@ import
 </dependencyManagement>
 ```
 
+### 打包JavaEE项目
+
+```xml
+<build>
+    <finalName>epgbest</finalName>
+    <plugins>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <!--在执行package动作的时候，自动打包-->
+            <executions>
+                <!-- 读channel写入库list数据 -->
+                <execution>
+                    <id>com.epg.EvpadEpgBest</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>com.epg.EvpadEpgBest</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>EvpadEpgBest</finalName>
+                    </configuration>
+                </execution>
+                <!-- 写list数据静态文件 -->
+                <execution>
+                    <id>com.epg.EPGListAutoRelease</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>com.epg.EPGListAutoRelease</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>EPGListAutoRelease</finalName>
+                    </configuration>
+                </execution>
+                <!-- 写日期静态文件 -->
+                <execution>
+                    <id>com.epg.SportInfoAutoRelease</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>com.epg.SportInfoAutoRelease</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>SportInfoAutoRelease</finalName>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+
 ## Maven-profile 配置
 
 project标签下除了modelVersion和坐标标签之外，其它标签都可以配置到 profile中。
