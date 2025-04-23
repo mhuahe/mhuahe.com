@@ -321,3 +321,15 @@ maven配置
 [2024-12-13 17:13:06] - com.mchange.v2.resourcepool.BasicResourcePool - WARN: com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask@7cb25a58 -- Acquisition Attempt Failed!!! Clearing pending acquires. While trying to acquire a needed new resource, we failed to succeed more than the maximum number of allowed acquisition attempts (30). Last acquisition attempt exception: 
 com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Could not create connection to database server.
 ```
+
+## Java handshake_failure
+
+原因：
+```
+表示你的 JDK 8 尝试使用 TLS 1.0 或 TLS 1.1 连接目标服务器，但服务器要求 TLS 1.2 或更高版本（现代网站通常禁用 TLS 1.0/1.1 以提高安全性）。
+```
+
+解决：
+```
+-Djdk.tls.client.protocols=TLSv1.2,TLSv1.3 -Dhttps.cipherSuites=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 
+```
