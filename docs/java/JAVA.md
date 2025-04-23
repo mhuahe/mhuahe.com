@@ -2076,6 +2076,20 @@ public static String objectToString(Object obj) {
 }
 ```
 
+### 扫描指定包中的所有类
+
+```java
+// 扫描指定包中的所有类
+Reflections reflections = new Reflections(
+        new ConfigurationBuilder()
+                // 显式指定包路径
+                .setUrls(ClasspathHelper.forPackage("com.example.api.task"))
+                .setScanners(Scanners.MethodsAnnotated)
+);
+// 获取所有带有 @TaskMethod 注解的方法
+Set<Method> methods = reflections.getMethodsAnnotatedWith(TaskMethod.class);
+```
+
 ## 注解 
 
 ### @Inherited
