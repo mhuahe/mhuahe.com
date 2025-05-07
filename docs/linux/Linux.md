@@ -1104,6 +1104,24 @@ $ git config --global --unset http.proxy
 $ git config --global --unset https.proxy
 ```
 
+### GitLab配置SSH Key
+
+1. 生成SSH Key
+
+```shell
+# 如果在C:\Users\Administrator\.ssh下没有id_rsa、id_rsa.pub
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+2. 配置GitLab的SSH Key
+
+- 登录到您的GitLab帐户。
+- 点击右上角的用户头像，选择“Settings”。
+- 在左侧导航栏中，选择“SSH Keys”。
+- 在“Key”文本框中，粘贴您的公钥（即id_rsa.pub文件中的内容）。
+- 输入一个描述，以便您能够识别该密钥。
+- 点击“Add Key”按钮，完成添加。
+
 ## MySQL
 
 下载地址：https://dev.mysql.com/downloads/installer/
