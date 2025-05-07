@@ -675,6 +675,69 @@ import
 </build>
 ```
 
+### 打包SpringMVC项目
+
+```xml
+<build>
+    <finalName>xxx</finalName>
+    <plugins>
+        <!-- Maven War 插件 -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.3.1</version>
+            <configuration>
+                <failOnMissingWebXml>false</failOnMissingWebXml>
+            </configuration>
+        </plugin>
+        <!-- Maven Compiler 插件 -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+            <configuration>
+                <source>1.8</source>
+                <target>1.8</target>
+            </configuration>
+        </plugin>
+        <!-- 确保所有切面类在编译时能被处理 -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>aspectj-maven-plugin</artifactId>
+            <version>1.14.0</version>
+            <configuration>
+                <complianceLevel>1.8</complianceLevel>
+                <source>1.8</source>
+                <target>1.8</target>
+                <showWeaveInfo>true</showWeaveInfo>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>compile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+    <!-- 资源 -->
+    <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+        </resource>
+        <resource>
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*.xml</include>
+            </includes>
+            <excludes>
+                <exclude>**/*.java</exclude>
+            </excludes>
+        </resource>
+    </resources>
+</build>
+```
+
 ## Maven-profile 配置
 
 project标签下除了modelVersion和坐标标签之外，其它标签都可以配置到 profile中。
