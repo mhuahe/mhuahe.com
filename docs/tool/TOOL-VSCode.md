@@ -127,6 +127,10 @@ sidebar_position: 3
 
 `workbench.tabs.wrap`：控制编辑器标签是否应该在到达视口边缘时换行。
 
+### 换行
+
+`editor.wordW`：`Word Wrap` 设置成 `wordWrapColumn`
+
 ### 设置代理
 
 ```json title="settings.json"
