@@ -18,6 +18,10 @@ Doc下， 可预览的是静态数据，不可预览的是动态数据。
 
 Copy As CUrl（bash），使用工具`curlconverter`，可生成语言代码。
 
+### 控制台无法粘贴
+
+输入`allow pasting`
+
 ### 初级
 
 #### 关键字搜索法
