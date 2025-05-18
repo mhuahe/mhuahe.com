@@ -362,4 +362,12 @@ User user = mapper.readValue(json, User.class);
 
 > 这三个依赖通常需要一起使用，因为它们相互依赖，共同提供了完整的 JSON 处理功能。如果只需要最基本的 JSON 处理，使用 jackson-core 就够了；但如果需要对象映射功能，则需要使用全部三个依赖。
 
+## bcprov-jdk*
 
+bcprov-jdk 是 Bouncy Castle 提供的加密库，它是一个开源的 Java 实现的安全提供者，可以为 Java 应用程序提供额外的密码算法支持。Bouncy Castle 的 bcprov-jdk 包含了多种加密算法实现，包括但不限于对称加密、非对称加密、哈希函数等。
+
+bcprov-jdk15on 和 bcprov-jdk18on 等不同后缀代表该版本的 Bouncy Castle 库支持的最低 JDK 版本：
+
+- `bcprov-jdk15on`: 支持从 JDK 1.5 到 JDK 8 的版本。这个版本号中的 "on" 指的是 "or newer"，意味着它不仅支持 JDK 1.5，也支持之后的所有版本直到 JDK 8。
+- `bcprov-jdk18on`: 支持从 JDK 8 开始及更新的版本（例如 JDK 11, JDK 17 等）。因此如果你正在使用 JDK 8 或更高版本，应该选择此版本或更高版本的支持包。
+- `bcprov-jdk15to18`: 这种命名方式表明该版本适用于 JDK 1.5 至 JDK 8 的范围。不过这种特定范围的支持包并不常见，通常你看到的是像 -jdk15on 或 -jdk18on 这样的标记。

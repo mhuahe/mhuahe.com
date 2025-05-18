@@ -3594,7 +3594,9 @@ public static String sendRedEnvelope(String url, String param) throws Exception 
 }
 ```
 
-## JAVA调用JS方法
+## JAVA交互JS
+
+### JAVA调用JS方法
 
 ```js
 // myScript.js
@@ -3654,6 +3656,42 @@ engine.eval(jsCode);
 Object result = ((Invocable) engine).invokeFunction("sayHello", "World");
 System.out.println(result);  // 输出: Hello, World
 ```
+
+### JAVA执行JS代码
+
+```java
+public static Object jsRequestHandler(JavascriptExecutor driver, String headers, String body) {
+    String script = readJsFile("scripts/apiRequest.js");
+    return ((JavascriptExecutor) driver).executeAsyncScript(script, headers, body);
+}
+```
+
+```js
+var callback = arguments[arguments.length - 1];
+
+(function(headersJson, payload) {
+    function makeRequest(headersJson, payload) {
+        const url = "https://api-h5.uvod.tv/video/info";
+        const headers = new Headers(JSON.parse(headersJson));
+        return fetch(url, {
+            method: 'POST',
+            headers,
+            body: payload
+        }).then(response => response.text());
+    }
+
+    makeRequest(arguments[0], arguments[1]).then(callback).catch(function(err) {
+        callback("Error: " + err);
+    });
+})(arguments[0], arguments[1]);
+```
+
+如果要在 Java 中获取 fetch 请求的结果，请注意：
+- fetch() 返回的是 Promise，而 executeScript() 在 Selenium 中并不等待 Promise 完成。
+- 如果希望等待 fetch 完成并返回响应，你需要用 executeAsyncScript() 而不是 executeScript()。
+
+总结：
+- 如需同步操作或结果值返回，请记得使用 executeAsyncScript 并在 JS 中使用回调 arguments[arguments.length - 1]。否则 fetch 是异步的，Java 获取不到结果。
 
 ## MapStruct
 
