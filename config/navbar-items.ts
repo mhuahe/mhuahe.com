@@ -17,7 +17,7 @@ const leftSidebarItems: NavbarItem[] = [
     type: "docSidebar",
     sidebarId: "c",
     position: "left",
-    label: "C语言",
+    label: "C",
   },
   {
     type: "docSidebar",
@@ -36,6 +36,12 @@ const leftSidebarItems: NavbarItem[] = [
     sidebarId: "python",
     position: "left",
     label: "Python",
+  },
+  {
+    type: "docSidebar",
+    sidebarId: "android",
+    position: "left",
+    label: "Android",
   },
   {
     type: "docSidebar",
@@ -77,12 +83,12 @@ const rightItems: NavbarItem[] = [
     position: "right",
     target: "_blank",
   },
-  {
-    to: "/pintree/index.html",
-    position: "right",
-    label: "书签",
-    target: "_blank",
-  },
+  // {
+  //   to: "/pintree/index.html",
+  //   position: "right",
+  //   label: "书签",
+  //   target: "_blank",
+  // },
   {
     to: "http://175.178.164.134:5244/",
     position: "right",
