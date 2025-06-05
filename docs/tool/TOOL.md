@@ -64,6 +64,11 @@ https://github.com/marticliment/UniGetUI
 
 > winget包管理器的图形界面
 
+### WizTree
+https://diskanalyzer.com/
+
+> 分析硬盘占用
+
 ## 传输工具
 
 ### syncthing

@@ -210,6 +210,121 @@ int2('1000000') == 64
 - `isinstance()`: 判断一个对象是否是某种类型
 - `dir()`: 获得一个对象的所有属性和方法
 
+## Python调用JS方法
+
+在 Python 中调用自定义的 JavaScript（JS）方法，通常有几种方式。以下是常用的几种方案和示例：
+
+### ✅ 方法一：使用 `execjs` 库（推荐）
+
+`execjs` 是一个非常流行的 Python 模块，可以自动检测并使用系统中安装的 JS 引擎（如 Node.js、V8、SpiderMonkey 等）来执行 JS 代码。
+
+#### 📦 安装
+
+```bash
+pip install PyExecJS
+# 或
+pip install PyExecJS2 # 推荐
+```
+
+#### 🧪 示例：Python 调用自定义 JS 函数
+
+##### 📁 自定义 JS 文件内容：`my_script.js`
+
+```javascript
+function sayHello(name) {
+    return "Hello, " + name + "!";
+}
+
+function addNumbers(a, b) {
+    return a + b;
+}
+```
+
+##### 🐍 Python 脚本调用它：
+
+```python
+import execjs
+
+# 读取 JS 文件内容
+with open("my_script.js", "r", encoding="utf-8") as f:
+    js_code = f.read()
+
+# 创建 JS 执行环境
+ctx = execjs.compile(js_code)
+
+# 调用函数
+result1 = ctx.call("sayHello", "Qwen")
+print(result1)  # 输出: Hello, Qwen!
+
+result2 = ctx.call("addNumbers", 5, 7)
+print(result2)  # 输出: 12
+```
+
+### ✅ 方法二：使用 `subprocess` 调用 Node.js 命令行（适合复杂项目）
+
+如果你的 JS 项目比较复杂（比如依赖模块），可以考虑直接通过命令行调用 Node.js 来执行脚本。
+
+#### 📁 my_script.js
+
+```javascript
+// 接收参数并返回结果
+const args = process.argv.slice(2);
+const name = args[0];
+console.log(`Hello, ${name}!`);
+```
+
+#### 🐍 Python 调用：
+
+```python
+import subprocess
+
+# 调用 Node.js 脚本并传参
+result = subprocess.run(
+    ["node", "my_script.js", "Qwen"],
+    capture_output=True,
+    text=True
+)
+
+print(result.stdout.strip())  # 输出: Hello, Qwen!
+```
+
+### ✅ 方法三：使用 `selenium` + 浏览器（适用于网页中的 JS）
+
+如果你需要从网页中调用 JS 方法（例如页面加载后执行某些 JS），可以使用 Selenium 控制浏览器。
+
+#### 🧪 示例：
+
+```python
+from selenium import webdriver
+
+driver = webdriver.Chrome()
+driver.get("http://example.com")
+
+# 执行页面上的 JS 函数
+result = driver.execute_script("""
+    function greet(name) {
+        return 'Hello, ' + name + '!';
+    }
+    return greet('Qwen');
+""")
+
+print(result)  # 输出: Hello, Qwen!
+```
+
+### 🔍 总结对比
+
+| 方法 | 特点 | 适用场景 |
+|------|------|----------|
+| `execjs` | 简单易用，支持多种 JS 引擎 | 快速执行纯 JS 函数 |
+| `subprocess + node.js` | 更灵活，可运行完整项目 | 复杂 JS 项目或依赖模块 |
+| `selenium` | 可操作网页 JS | 网页交互、爬虫、前端测试 |
+
+### ❗ 注意事项
+
+- 使用 `execjs` 时，请确保系统已安装 JS 引擎（推荐 Node.js）。
+- 如果你在 Linux/macOS 上遇到问题，检查 PATH 是否包含 `node`。
+- 在 Windows 上安装 Node.js 后记得重启终端或编辑器。
+
 ## 问题
 
 ### 解决cmd输入python弹出应用商店的问题

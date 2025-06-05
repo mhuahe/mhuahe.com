@@ -23,6 +23,7 @@ sidebar_position: 2
 - lombok
 - GenerateAllSetter
 - GsonFormat
+- GsonFormatPlus
 - POJO to JSON
 
 ### 翻译

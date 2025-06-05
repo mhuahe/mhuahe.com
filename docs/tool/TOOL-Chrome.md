@@ -9,6 +9,27 @@ sidebar_position: 4
 - 切换引擎：设置搜索引擎的快捷访问，如百度，设置为`bd`：`bd + space`，进入百度搜索引擎。
 - 站内搜索：比如在www.yinwang.org搜索`中国人`的语法为`site:www.yinwang.org 中国人`
 
+## F12开发者
+
+- Fetch/XHR：结构化数据
+- Doc：HTML数据
+
+Doc下， 可预览的是静态数据，不可预览的是动态数据。
+
+Copy As CUrl（bash），使用工具`curlconverter`，可生成语言代码。
+
+### 控制台无法粘贴
+
+输入`allow pasting`
+
+### 初级
+
+#### 关键字搜索法
+
+#### 堆栈分析法
+
+#### hook定位法
+
 ## 插件英雄榜
 https://zhaoolee.com/ChromeAppHeroes/#/
 

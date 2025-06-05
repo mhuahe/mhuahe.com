@@ -3594,6 +3594,105 @@ public static String sendRedEnvelope(String url, String param) throws Exception 
 }
 ```
 
+## JAVA交互JS
+
+### JAVA调用JS方法
+
+```js
+// myScript.js
+function sayHello(name) {
+    return "Hello, " + name + "!";
+}
+function addNumbers(a, b) {
+    return a + b;
+}
+```
+
+```java
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.io.FileReader;
+
+public class JsInvoker {
+    public static void main(String[] args) throws Exception {
+        // 创建脚本引擎管理器
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
+
+        // 加载并执行 JS 文件
+        String jsFilePath = "myScript.js"; // 替换为你的 JS 文件路径
+        engine.eval(new FileReader(jsFilePath));
+
+        // 将 ScriptEngine 强转为 Invocable 接口，以便调用函数
+        if (engine instanceof Invocable invocableEngine) {
+            // 调用 sayHello 函数
+            Object result1 = invocableEngine.invokeFunction("sayHello", "Qwen");
+            System.out.println(result1);  // 输出: Hello, Qwen!
+
+            // 调用 addNumbers 函数
+            Object result2 = invocableEngine.invokeFunction("addNumbers", 5, 7);
+            System.out.println(result2);  // 输出: 12
+        } else {
+            System.out.println("脚本引擎不支持 Invocable 接口");
+        }
+    }
+}
+```
+
+注意事项：
+- invokeFunction() 可以调用全局函数。
+- 如果你要调用的是某个对象上的方法，可以使用 invokeMethod()。
+- Java 内置的 JavaScript 引擎是 Nashorn（JDK 8~14），但在 JDK 15+ 已被移除。
+  - 如果使用的是 JDK 15 或更高版本，你需要：
+    - 单独引入 Nashorn（如通过 Maven）
+    - 或者使用 GraalVM 等替代方案。
+
+如果你不想读取文件而是直接写 JS 字符串：
+```js
+String jsCode = "function sayHello(name) { return 'Hello, ' + name; }";
+engine.eval(jsCode);
+
+Object result = ((Invocable) engine).invokeFunction("sayHello", "World");
+System.out.println(result);  // 输出: Hello, World
+```
+
+### JAVA执行JS代码
+
+```java
+public static Object jsRequestHandler(JavascriptExecutor driver, String headers, String body) {
+    String script = readJsFile("scripts/apiRequest.js");
+    return ((JavascriptExecutor) driver).executeAsyncScript(script, headers, body);
+}
+```
+
+```js
+var callback = arguments[arguments.length - 1];
+
+(function(headersJson, payload) {
+    function makeRequest(headersJson, payload) {
+        const url = "https://api-h5.uvod.tv/video/info";
+        const headers = new Headers(JSON.parse(headersJson));
+        return fetch(url, {
+            method: 'POST',
+            headers,
+            body: payload
+        }).then(response => response.text());
+    }
+
+    makeRequest(arguments[0], arguments[1]).then(callback).catch(function(err) {
+        callback("Error: " + err);
+    });
+})(arguments[0], arguments[1]);
+```
+
+如果要在 Java 中获取 fetch 请求的结果，请注意：
+- fetch() 返回的是 Promise，而 executeScript() 在 Selenium 中并不等待 Promise 完成。
+- 如果希望等待 fetch 完成并返回响应，你需要用 executeAsyncScript() 而不是 executeScript()。
+
+总结：
+- 如需同步操作或结果值返回，请记得使用 executeAsyncScript 并在 JS 中使用回调 arguments[arguments.length - 1]。否则 fetch 是异步的，Java 获取不到结果。
+
 ## MapStruct
 
 MapStruct是一款基于Java注解的对象属性映射工具
