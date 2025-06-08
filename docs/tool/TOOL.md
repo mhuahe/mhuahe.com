@@ -69,6 +69,12 @@ https://diskanalyzer.com/
 
 > 分析硬盘占用
 
+### OneCommander
+
+https://www.onecommander.com/
+
+> 文件管理工具
+
 ## 传输工具
 
 ### syncthing
@@ -174,6 +180,18 @@ https://github.com/Eugeny/tabby
 https://www.xterminal.cn/
 
 ## 笔记工具
+
+### EmEditor
+
+https://www.emeditor.com/
+
+> 文本工具
+
+### EditPlus
+
+https://www.editplus.com/
+
+> 文本工具
 
 ### typora
 https://www.typora.io/
@@ -431,6 +449,17 @@ $ yt-dlp -U
 $ yt-dlp -F --cookies cookies.txt https://www.youtube.com/watch?v=3UfqgYafgss
 ```
 
+## 视频工具
+
+### potplayer
+
+https://potplayer.daum.net/
+http://www.potplayercn.com/
+
+### KMPlayer
+
+https://www.kmplayer.com/home
+
 ## 翻译工具
 
 ### STranslate
@@ -438,6 +467,12 @@ $ yt-dlp -F --cookies cookies.txt https://www.youtube.com/watch?v=3UfqgYafgss
 https://github.com/ZGGSONG/STranslate
 
 > 一款即开即用、即用即走的翻译、OCR工具
+
+### Pot
+
+https://github.com/pot-app/pot-desktop
+
+> 跨平台划词翻译和OCR
 
 ## WebDAV
 
