@@ -994,6 +994,15 @@ Arg：一些参数，可以指定输出文件。
 
 - 使用`rz` 、`rz -be` 上传本地文件到linux。使用`sz`下载linux上文件到本地
 
+## Linux空格问题
+
+如果你在 Windows 编辑器（如 Notepad）里写的脚本，在 CentOS 上执行时可能会出错，尤其是出现 : No such file or directory 但文件确实存在时。
+
+```bash
+sudo yum install -y dos2unix  # 安装dos2unix工具
+dos2unix sign_apk.sh          # 转换脚本格式
+```
+
 ## git
 
 ### 基本命令
