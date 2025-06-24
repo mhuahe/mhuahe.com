@@ -164,7 +164,8 @@ idea.log.path=${idea.system.path}/log
 
 3. 开启连字 ：Settings>>Editor>>Font 下的 Enable Ligatures
 
-4. 配置注释 ：Settings>>Editor>>File and Code Templates下的模板设置
+4. 配置注释 ：
+   - Settings>>Editor>>File and Code Templates下的模板设置：
     ```java
     /**
      * ${description}
@@ -173,7 +174,24 @@ idea.log.path=${idea.system.path}/log
      * @since ${YEAR}年${MONTH}月${DAY}日${HOUR}:${MINUTE}:${SECOND}
      */
     ```
-5. 显示方法分割线 ：Settings>>Editor>>General>>Appearance 下的 Show method separators
+    
+    - Live Templates下的模板设置：
+    ```java
+    /**
+     * $description$
+     *
+     * @author Alan
+     * @since $date$
+     */
+    ```
+5. 显示方法分割线 ：
+   - Settings>>Editor>>General>>Appearance 下的 Show method separators
+   
+6. 行注释设置，不从行首开始，在代码之前：
+   - Settings>>Code Style>>Java>>Code Generation
+   - 去掉`Line comment at first column` 和 `Block comment at first column`。
+   - 勾上`Add a space at common start`
+
 
 ## generated.http
 
