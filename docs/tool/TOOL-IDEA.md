@@ -14,6 +14,7 @@ sidebar_position: 2
 - Statictic
 
 ### Dao工具
+- EasyCode
 - MyBatisCodeHelperPro
 - MybatisX
 - Free MyBatis plugin
