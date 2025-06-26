@@ -18,6 +18,9 @@ type CustomFooter = Omit<Footer, 'style' | 'links' | 'copyright'> & {
   copyright: Footer['copyright'];
 };
 
+const packageJson = require('../package.json');
+const version = packageJson.dependencies['@docusaurus/core'];
+
 export const footerItems: CustomFooter = {
-  copyright: `© ${new Date().getFullYear()} mhuahe. Built with <a href="https://docusaurus.io/" target="_blank">Docusaurus</a>.`,
+  copyright: `© ${new Date().getFullYear()} mhuahe. Built with <a href="https://docusaurus.io/" target="_blank">Docusaurus</a>${version}.`,
 };

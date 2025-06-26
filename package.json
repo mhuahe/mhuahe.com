@@ -15,12 +15,12 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.6.2",
-    "@docusaurus/faster": "^3.6.2",
-    "@docusaurus/plugin-rsdoctor": "^3.6.2",
-    "@docusaurus/preset-classic": "^3.6.2",
-    "@docusaurus/theme-live-codeblock": "^3.6.2",
-    "@docusaurus/theme-mermaid": "^3.6.2",
+    "@docusaurus/core": "^3.8.1",
+    "@docusaurus/faster": "^3.8.1",
+    "@docusaurus/plugin-rsdoctor": "^3.8.1",
+    "@docusaurus/preset-classic": "^3.8.1",
+    "@docusaurus/theme-live-codeblock": "^3.8.1",
+    "@docusaurus/theme-mermaid": "^3.8.1",
     "@mdx-js/react": "^3.0.0",
     "@types/react-dom": "^18.3.0",
     "clsx": "^2.0.0",
@@ -34,9 +34,9 @@
     "screenfull": "^6.0.2"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.6.2",
-    "@docusaurus/tsconfig": "^3.6.0",
-    "@docusaurus/types": "^3.6.0",
+    "@docusaurus/module-type-aliases": "^3.8.1",
+    "@docusaurus/tsconfig": "^3.8.1",
+    "@docusaurus/types": "^3.8.1",
     "typescript": "~5.5.2"
   },
   "browserslist": {
