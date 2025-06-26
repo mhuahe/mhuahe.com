@@ -24,6 +24,14 @@ https://arc.net/
 
 ## 抓包工具
 
+### wireshark
+https://www.wireshark.org/
+> 主抓http、tcp、dns
+
+### Fiddler
+https://www.telerik.com/download/fiddler
+> 主抓https，需要开启桥接，代理；代理默认端口8888
+
 ### charles-proxy
 https://www.charlesproxy.com/
 
@@ -254,6 +262,12 @@ https://github.com/barry-ran/QtScrcpy
 | MOD+o/Shift+o               | 开关设备屏幕（保持镜像） |
 | MOD+n/Shift+n               | 开关通知栏               |
 | MOD+c、MOD+x、MOD+v         | 复制、剪切、粘贴         |
+
+## 模拟器
+
+### MuMu模拟器
+https://mumu.163.com/
+> 抓https启用桥接；设置代理 8888
 
 ## Ventoy
 https://www.ventoy.net/cn/doc_start.html
