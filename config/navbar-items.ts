@@ -90,12 +90,6 @@ const rightItems: NavbarItem[] = [
   //   target: "_blank",
   // },
   {
-    to: "http://175.178.164.134:5244/",
-    position: "right",
-    label: "AList",
-    target: "_blank",
-  },
-  {
     href: "https://github.com/mhuahe/mhuahe.com",
     position: "right",
     className: "navbar-github-link",
