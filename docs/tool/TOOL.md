@@ -496,6 +496,53 @@ https://github.com/mockoon/mockoon
 
 https://designer.mocky.io/
 
+## 搭建个人音乐库
+
+### navidrome
+
+https://github.com/navidrome/navidrome
+
+> 音乐库搭建；docker搭建
+
+```yml
+version: "3"
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    ports:
+      - "4533:4533" #自定义端口
+    restart: unless-stopped
+    environment:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+    volumes:
+      - "~/Music/data:/data"   #这里的~/Music/data为data数据真实路径
+      - "~/Music/music:/music:ro"    #这里的~/Music/music为音乐文件真实路径
+```
+
+music-tag-web
+
+https://github.com/xhongc/music-tag-web
+
+> 音乐刮削：歌词、歌曲信息等；docker搭建
+
+```yml
+version: '3'
+services:
+  music-tag:
+    image: xhongc/music_tag_web:latest
+    container_name: music-tag-web
+    ports:
+      - "8002:8002"
+    volumes:
+      - /root/Music:/app/media
+      - /root/Music/tag-config:/app/data
+      - /root/Music/tag-download:/app/download
+    restart: always
+```
+
 ## 代理相关
 
 ### VPN和机场的区别
