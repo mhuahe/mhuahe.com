@@ -994,6 +994,15 @@ Arg：一些参数，可以指定输出文件。
 
 - 使用`rz` 、`rz -be` 上传本地文件到linux。使用`sz`下载linux上文件到本地
 
+## Linux空格问题
+
+如果你在 Windows 编辑器（如 Notepad）里写的脚本，在 CentOS 上执行时可能会出错，尤其是出现 : No such file or directory 但文件确实存在时。
+
+```bash
+sudo yum install -y dos2unix  # 安装dos2unix工具
+dos2unix sign_apk.sh          # 转换脚本格式
+```
+
 ## git
 
 ### 基本命令
@@ -1121,6 +1130,25 @@ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 - 在“Key”文本框中，粘贴您的公钥（即id_rsa.pub文件中的内容）。
 - 输入一个描述，以便您能够识别该密钥。
 - 点击“Add Key”按钮，完成添加。
+
+### .gitignore重提交
+
+如果IDEA 中.gitignore 文件没有立即生效，通常是因为被忽略的文件已经被Git 追踪(track) 了。.gitignore 只对未被追踪的文件有效。要解决这个问题，需要清除本地缓存并重新提交。
+
+- 清除本地缓存:在IDEA 的终端(Terminal) 中执行以下命令，这会删除所有已跟踪文件的缓存，但不会删除实际文件：
+```shell
+git rm -r --cached .
+```
+- 重新提交，这会将所有文件（包括.gitignore 中忽略的文件）添加到暂存区，然后提交到本地仓库:
+```shell
+git add .
+git commit -m "Update .gitignore"
+```
+
+分析:
+- .gitignore 文件用于告诉Git 哪些文件或文件夹应该被忽略，不参与版本控制.
+- .gitignore 只对那些尚未被Git 追踪(track) 的文件有效。如果某个文件已经被添加到Git 仓库，即使在 .gitignore 中声明忽略，Git 仍然会追踪它.
+- 当修改 .gitignore 后，需要清除Git 的缓存，让Git 重新认识 .gitignore 的规则.
 
 ## MySQL
 

@@ -124,12 +124,15 @@ fnm use 18.17.0
 | ------------------------------------------------------------- | --------------------------- |
 | `npm install --global yarn`                                   | 安装 yarn                   |
 | `yarn --version`                                              | 查看版本                    |
+| `yarn set version latest`                                     | 升级版本                    |
 | `yarn add <package-name>@<version>`                           | 安装指定依赖                |
 | `yarn cache clean`                                            | 清理缓存删除依赖            |
 | `rmdir /s /q node_modules`                                    | 删除依赖                    |
 | `yarn global remove package-name`                             | 删除全局安装的依赖项        |
 | `yarn install --frozen-lockfile`                              | 忽略 yarn.lock 重新安装依赖 |
+| `yarn config list`                                            | 查看配置                   |
 | `yarn config set [proxy\|https-proxy] http://127.0.0.1:10809` | 设置代理                    |
+| `yarn config delete [proxy\|https-proxy]`                     | 删除代理配置                 |
 
 ## pnpm
 

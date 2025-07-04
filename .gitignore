@@ -9,6 +9,8 @@
 .idea
 .cache-loader
 .vscode
+.yarn
+.yarnrc
 
 # Misc
 .DS_Store

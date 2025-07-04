@@ -46,12 +46,17 @@ const config: Config = {
 
   future: {
     // @docusaurus/faster
+    v4: {
+      removeLegacyPostBuildHeadAttribute: true, // 更好地利用所有可用的 CPU，缩短静态站点生成时间，并控制潜在的内存泄漏
+    },
     experimental_faster: {
+      ssgWorkerThreads: true, // 使用SSG工作线程，为静态站点生成任务分配多个线程
       swcJsLoader: true, // 使用SWC转译 JS (而不是Babel )
       swcJsMinimizer: true, // 使用SWC来缩小 JS （而不是Terser）
       swcHtmlMinimizer: true, // 使用SWC来缩小 HTML （而不是HtmlMinimizer）
       lightningCssMinimizer: true, // 使用Lightning CSS来缩小CSS（而不是CSSMinimizer）
-      rspackBundler: false, // 使用Rspack作为捆绑器（而不是Webpack）
+      rspackBundler: true, //使用Rspack作为捆绑器（而不是Webpack）
+      rspackPersistentCache: true, // 使用Rspack持久化缓存，为浏览器/Node.js 环境编译 MDX 文件一次，而不是两次
       mdxCrossCompilerCache: true, // 使用MDX交叉编译器缓存，为浏览器/Node.js 环境编译 MDX 文件一次，而不是两次
     },
   },

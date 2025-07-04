@@ -181,6 +181,50 @@ LocalDate.isBefore(LocalDate localDate);
 LocalDate.minus()
 ```
 
+时区转换
+
+```java
+// UTC
+public static final String UTC_ZONE_ID = "Etc/GMT";
+// UTC-3
+public static final String UTC_MINUS_3_ZONE_ID = "Etc/GMT+3";
+// UTC-4
+public static final String UTC_MINUS_4_ZONE_ID = "Etc/GMT+4";
+// UTC+8
+public static final String UTC_PLUS_8_ZONE_ID = "Etc/GMT-8";
+/**
+ * 转换时区（自定义格式）
+ *
+ * @param localDateTime 时间
+ * @param fromZone      原始时区ID
+ * @param toZone        目标时区ID
+ * @param outputFormat  输出格式
+ * @return 转换后的日期时间字符串
+ * @throws DateTimeParseException 如果日期格式不匹配
+ */
+public static String convertTimeZone(
+        LocalDateTime localDateTime,
+        String fromZone,
+        String toZone,
+        String outputFormat) {
+    // 应用原始时区
+    ZonedDateTime fromZonedDateTime = localDateTime.atZone(ZoneId.of(fromZone));
+    // 转换到目标时区
+    ZonedDateTime toZonedDateTime = fromZonedDateTime.withZoneSameInstant(ZoneId.of(toZone));
+    // 格式化为字符串
+    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern(outputFormat);
+    return toZonedDateTime.format(outputFormatter);
+}
+/**
+ * 获取当前系统默认时区ID
+ *
+ * @return 系统默认时区ID
+ */
+public static String getSystemDefaultZoneId() {
+    return ZoneId.systemDefault().toString();
+}
+```
+
 ---
 ### 集合
 
