@@ -6,11 +6,20 @@ sidebar_position: 1
 
 ## 截屏工具
 
+### 小旺AI截图
+https://www.xiaowang.com/
+
+> 截图、录屏、OCR、翻译等
+
 ### Snipaste
 https://zh.snipaste.com/
 
+> 截图
+
 ### PixPin
 https://pixpinapp.com/
+
+> 截图、录屏等
 
 ## 搜索工具
 
