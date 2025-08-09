@@ -497,6 +497,12 @@ https://github.com/pot-app/pot-desktop
 
 > 跨平台划词翻译和OCR
 
+## 剪切板
+
+### EcoPaste
+
+https://github.com/EcoPasteHub/EcoPaste
+
 ## WebDAV
 
 webdav就像一个存储服务，各种应用都可以连接到它，允许应用直接访问我们的云盘内容，对其进行读写操作。推荐使用[坚果云](https://www.jianguoyun.com/)去使用webdav。
