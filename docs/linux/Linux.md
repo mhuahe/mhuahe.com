@@ -1194,6 +1194,38 @@ $ mysql -u root -p
 
 > 如果出现`Can‘t create test file`，删除data目录，执行`mysqld --initialize-insecure`
 
+### 允许外部访问
+
+1. 用管理员权限打开 `my.ini`。
+
+2. 找到 `[mysqld]` 配置块，添加或修改：
+
+   ```ini
+   [mysqld]
+   bind-address = 0.0.0.0
+   ```
+
+   ⚠️ Windows 下有时这个配置默认被注释掉或者是 `127.0.0.1`，改成 `0.0.0.0` 就能接受所有 IP 的连接。
+
+3. 重启 MySQL 服务：
+
+   * 在 **服务管理器**里找到 `MySQL`，点“重新启动”。
+
+
+4. 改完 `my.ini` 只是让 MySQL **监听外部 IP**，还需要给用户授权：
+
+  ```sql
+  GRANT ALL PRIVILEGES ON sports_match.* TO 'sports'@'%' IDENTIFIED BY '123456';
+  FLUSH PRIVILEGES;
+  ```
+5. 还要确保 Windows 防火墙允许 **3306 端口**：
+
+  ```powershell
+  netsh advfirewall firewall add rule name="MySQL" dir=in action=allow protocol=TCP localport=3306
+  ```
+
+---
+
 ## github
 
 ### Github Pages
