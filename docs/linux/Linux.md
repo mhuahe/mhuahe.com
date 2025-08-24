@@ -1226,6 +1226,67 @@ $ mysql -u root -p
 
 ---
 
+## Redis
+
+### 允许外部访问
+
+1. 修改 Redis 配置文件
+找到你的 **redis.windows.conf** 或 **redis.conf** 文件，修改以下配置：
+
+```conf
+# 原始配置，限制只能本地访问
+bind 127.0.0.1
+
+# 修改为允许所有来源（不安全，但方便测试）
+# 或指定某个内网IP，比如 bind 192.168.1.100
+bind 0.0.0.0
+
+# 默认 protected-mode 是 yes，阻止远程访问
+protected-mode no
+```
+
+2. 配置 Redis 访问密码
+
+在 `redis.conf` 中找到：
+
+```conf
+# requirepass foobared
+```
+
+取消注释并设置你自己的密码，比如：
+
+```conf
+requirepass myStrongPass123
+```
+
+3. 重启 Redis
+
+如果是 Windows 下的服务版：
+
+```powershell
+# 停止服务
+net stop redis
+
+# 启动服务
+net start redis
+```
+
+如果是手动运行：
+
+```powershell
+redis-server.exe redis.windows.conf
+```
+
+4. Windows 防火墙放行 6379 端口
+
+执行以下命令（管理员 PowerShell）：
+
+```powershell
+netsh advfirewall firewall add rule name="Redis 6379" dir=in action=allow protocol=TCP localport=6379
+```
+
+---
+
 ## github
 
 ### Github Pages
