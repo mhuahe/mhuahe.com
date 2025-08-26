@@ -3241,6 +3241,14 @@ public void test() {
 </dependency>
 ```
 
+## 二维码
+
+[zxing](https://github.com/zxing/zxing)
+
+## 图片操作
+
+[Thumbnailator](https://github.com/coobird/thumbnailator)
+
 ## MinIO
 
 ```sql
