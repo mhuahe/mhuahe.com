@@ -38,6 +38,7 @@ const sidebars: SidebarsConfig = {
         'java/JAVA',
         'java/JAVA-JDK-Version',
         'java/JAVA-JVM',
+        'java/JAVA-Jsoup',
         'java/JAVA-Thread',
         'java/JAVA-Servlet',
         'java/JAVA-Design-Pattern',
