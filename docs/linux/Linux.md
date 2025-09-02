@@ -1048,6 +1048,73 @@ $ git remote update origin --prune
 $ git remote set-url origin https://github.com/mhuahe/mhuahe.com.git
 ```
 
+### upstream上游同步
+
+#### Fork + Upstream
+
+1. **在 GitHub 上 Fork**
+
+   * 打开原项目的 GitHub 页面
+   * 点右上角 **Fork**
+   * 创建到你的 GitHub 账号下
+
+2. **克隆你自己的 Fork 仓库**
+
+```bash
+git clone https://github.com/你的用户名/项目名.git
+cd 项目名
+```
+
+这样你现在在自己的仓库工作。
+
+3. **添加原仓库为上游（upstream）**
+
+```bash
+git remote add upstream https://github.com/原作者用户名/项目名.git
+git remote -v
+```
+
+结果应该有两个远程：
+
+```
+origin   https://github.com/你的用户名/项目名.git (fetch)
+upstream https://github.com/原作者用户名/项目名.git (fetch)
+```
+
+4. **在自己的分支开发并提交**
+
+```bash
+git checkout -b my-feature
+# 修改代码
+git add .
+git commit -m "Add my feature"
+git push origin my-feature
+```
+
+5. **拉取原仓库的更新**
+
+以后原仓库有更新时：
+
+```bash
+git fetch upstream
+git merge upstream/main
+# 或者： git rebase upstream/main
+git push origin main
+```
+
+这样你的 `main` 分支就和原项目保持同步。
+
+#### Local + Upstream
+
+如果你只是想把现有 clone 的仓库改为提交到自己的仓库：
+
+```bash
+git remote set-url origin https://github.com/你的用户名/项目名.git
+git remote add upstream https://github.com/原作者用户名/项目名.git
+```
+
+这样 `origin` 指向你自己的仓库，`upstream` 指向原仓库。
+
 ### git回滚
 
 同IDEA的undo commit
