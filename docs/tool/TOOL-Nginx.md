@@ -5,6 +5,33 @@ sidebar_label: 工具-Nginx
 
 # Nginx
 
+## 部署Nginx
+
+1、`./configure`: 编译前的配置和依赖检查
+2、`make`：编译
+3、`make install`: 安装
+
+Nginx安装完成后，默认自动创建 /usr/local/nginx 目录
+
+## 基本命令
+
+```shell
+# 启动nginx
+$ nginx -c nginx.conf
+
+# 停止nginx
+$ nginx -s stop
+
+# 重载nginx
+$ nginx -s reload
+
+# 杀掉nginx
+$ nginx -s quit
+
+# 检查nginx配置
+$ nginx -t
+```
+
 ```sql
 -- 查看是否启动成功
 tasklist /fi "imagename eq nginx.exe" 
@@ -28,13 +55,15 @@ taskkill /f /t /im nginx.exe
 include D:/hayes/software-0104/nginx-1.22.1/conf/conf.d/*.conf;
 ```
 
-####  反向代理
+## 配置方式
+
+###  反向代理
 
 ```sql
 -- 反向代理就是当请求访问你的代理服务器时，代理服务器会对你的请求进行转发，可以转发到静态的资源路径上去，也可以转发到动态的服务接口上去
 ```
 
-##### 静态代理
+#### 静态代理
 
 ```sql
 -- 静态代理就是将请求代理到不同的静态资源路径上去，这里我们将对docs.hmh.com的请求代理到我的文档项目中
@@ -59,7 +88,7 @@ server {
 }
 ```
 
-#####  动态代理
+####  动态代理
 
 ```sql
 -- 动态代理就是把代理服务器的请求转发到另一个服务上去，这里我们将对api.hmh.com的请求代理到hmh-start的后台服务上去
@@ -84,7 +113,7 @@ server {
 }
 ```
 
-#### 文件压缩
+### 文件压缩
 
 ```sql
 -- 如果我们租用了一个带宽很低的服务器，网站访问速度会很慢，这时我们可以通过让nginx开启GZIP压缩来提高网站的访问速度。这里我们以mall的前端项目为例来演示下它的提速效果
@@ -125,7 +154,7 @@ http {
 -- nginx返回请求头中添加了Content-Encoding: gzip的信息
 ```
 
-#### 地址重写
+### 地址重写
 
 ```sql
 -- 有的时候我们的网站更换了域名，但还有用户在使用老的域名访问，这时可以通过nginx的地址重写来让用户跳转到新的域名进行访问
@@ -155,7 +184,7 @@ server {
 -- 此时访问旧域名api.hmh.com会直接跳转到www.macrozheng.com去
 ```
 
-#### 按目录划分项目
+### 按目录划分项目
 
 ```sql
 -- 有时候我们需要使用同一个域名来访问不同的前端项目，这时候就需要通过子目录来区分前端项目了
@@ -196,9 +225,9 @@ server {
 }
 ```
 
-#### nginx支持https
+### nginx支持https
 
-##### 生成SSL自签名证书
+#### 生成SSL自签名证书
 
 ```sql
 -- 首先创建SSL证书私钥，期间需要输入两次用户名和密码，生成文件为blog.key
@@ -274,7 +303,7 @@ server {
 }
 ```
 
-##### 使用受信任的证书
+#### 使用受信任的证书
 
 ```sql
 -- 之前我们使用的是自签名的SSL证书，对于浏览器来说是无效的。使用权威机构颁发的SSL证书浏览器才会认为是有效的，这里给大家推荐两种申请免费SSL证书的方法，一种是从阿里云申请，另一种是从FreeSSL申请

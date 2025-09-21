@@ -1217,25 +1217,6 @@ git commit -m "Update .gitignore"
 - .gitignore 只对那些尚未被Git 追踪(track) 的文件有效。如果某个文件已经被添加到Git 仓库，即使在 .gitignore 中声明忽略，Git 仍然会追踪它.
 - 当修改 .gitignore 后，需要清除Git 的缓存，让Git 重新认识 .gitignore 的规则.
 
-## Nginx
-
-```shell
-# 启动nginx
-$ nginx -c nginx.conf
-
-# 停止nginx
-$ nginx -s stop
-
-# 重载nginx
-$ nginx -s reload
-
-# 杀掉nginx
-$ nginx -s quit
-
-# 检查nginx配置
-$ nginx -t
-```
-
 ## MySQL
 
 下载地址：https://dev.mysql.com/downloads/installer/
