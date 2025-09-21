@@ -1471,5 +1471,7 @@ $ yum -y install vim-minimal
 $ yum -y install vim-enhanced
 ```
 
+### Windows任务栏消失
 
+打开任务管理器找到`explorer.exe`重启进程
 
