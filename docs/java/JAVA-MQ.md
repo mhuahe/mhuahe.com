@@ -515,6 +515,48 @@ SELECT * FROM "message.publish" WHERE topic =~ 'l3/s/n/#' and payload.method in 
     bin/kafka-server-start.sh -daemon config/server.properties
     ```
 
+### Windows搭建Kafka
+
+https://kafka.apache.org/
+
+https://blog.csdn.net/xyajia/article/details/122774159
+
+- 启动zookeeper
+
+```shell
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+```
+
+- 启动kafka
+
+```shell
+bin\windows\kafka-server-start.bat config\server.properties
+```
+
+- 创建Topic
+
+```shell
+bin\windows\kafka-topics.bat --create  --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic iris
+```
+
+- 查看topic列表
+
+```shell
+bin\windows\kafka-topics.bat --list  --bootstrap-server localhost:9092
+```
+
+- 监听指定主题的所有消息
+
+```shell
+bin\windows\kafka-console-consumer.bat --topic test-topic --from-beginning --bootstrap-server localhost:9092
+```
+
+- 只监听新消息（不显示历史消息）
+
+```shell
+bin\windows\kafka-console-consumer.bat --topic test-topic --bootstrap-server localhost:9092
+```
+
 ### Springboot集成
 
 ```xml
