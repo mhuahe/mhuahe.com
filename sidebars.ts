@@ -87,6 +87,7 @@ const sidebars: SidebarsConfig = {
         'java/JAVA-Maven-Dependent',
         'java/JAVA-PDF',
         'java/JAVA-Hutool',
+        'java/JAVA-Guava',
         'java/JAVA-Encryption',
         'java/JAVA-WebSocket',
       ],
