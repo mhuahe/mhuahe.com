@@ -24,6 +24,13 @@ Next.js App Router 使用文件系统路由：路由由目录结构自动映射�
    src/app/api/auth/user/[id]/route.ts  →  /api/auth/user/:id
    ```
 
+4. **自定义路由方式**
+
+    - 在 src/auth 目录创建 route.ts
+    - `export { POST } from "../api/auth/route";`
+
+这样可以访问接口 /auth，也可以访问到 /api/auth接口
+
 这是 Next.js App Router 的核心特性：基于文件系统的路由，让路由组织更直观。
 
 ### 示例
