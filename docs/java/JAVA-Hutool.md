@@ -72,7 +72,7 @@ host = smtp.exmail.qq.com
 # 邮件服务器的SMTP端口，可选，默认25
 port = 465
 # 发件人（必须正确，否则发送失败）
-from = cscicloud@chinacsci.com
+from = mhuahe@mhuahe.com
 # 用户名，默认为发件人邮箱前缀
 # user = xxxx
 # 密码（注意，某些邮箱需要为SMTP服务单独设置授权码，详情查看相关帮助）

@@ -1449,7 +1449,7 @@
       {
         "type": "folder",
         "addDate": 1718334172213,
-        "title": "CSCI",
+        "title": "mhuahe",
         "children": [
           {
             "type": "folder",
@@ -1507,8 +1507,8 @@
                     "type": "link",
                     "addDate": 1725330609990,
                     "title": "我的工作台 - 全面风险管理服务(演示环境)",
-                    "icon": "https://logo.clearbit.com/pmsaasdemo.chinacsci.com",
-                    "url": "https://pmsaasdemo.chinacsci.com/base/general"
+                    "icon": "https://logo.clearbit.com/pmsaasdemo.chinamhuahe.com",
+                    "url": "https://pmsaasdemo.chinamhuahe.com/base/general"
                   }
                 ]
               },
@@ -1584,8 +1584,8 @@
                     "type": "link",
                     "addDate": 1731582634205,
                     "title": "晋商-生产（域名）",
-                    "icon": "https://logo.clearbit.com/jinsbipm.chinacsci.com",
-                    "url": "https://jinsbipm.chinacsci.com/base/general"
+                    "icon": "https://logo.clearbit.com/jinsbipm.chinamhuahe.com",
+                    "url": "https://jinsbipm.chinamhuahe.com/base/general"
                   }
                 ]
               },
@@ -1668,8 +1668,8 @@
                     "type": "link",
                     "addDate": 1672282630453,
                     "title": "全面风险管理服务(西部生产)",
-                    "icon": "https://logo.clearbit.com/xbdb.chinacsci.com",
-                    "url": "https://xbdb.chinacsci.com/login"
+                    "icon": "https://logo.clearbit.com/xbdb.chinamhuahe.com",
+                    "url": "https://xbdb.chinamhuahe.com/login"
                   }
                 ]
               },
@@ -1773,8 +1773,8 @@
                     "type": "link",
                     "addDate": 1710299247413,
                     "title": "产业债看板: 首页 （原型图）",
-                    "icon": "https://logo.clearbit.com/data-bi.chinacsci.com",
-                    "url": "https://data-bi.chinacsci.com/#/site/data/views/_17066928383530/sheet0?:iid=1"
+                    "icon": "https://logo.clearbit.com/data-bi.chinamhuahe.com",
+                    "url": "https://data-bi.chinamhuahe.com/#/site/data/views/_17066928383530/sheet0?:iid=1"
                   }
                 ]
               },
@@ -1838,8 +1838,8 @@
                 "type": "link",
                 "addDate": 1665640178715,
                 "title": "Projects · Dashboard · GitLab",
-                "icon": "https://logo.clearbit.com/gitlab.chinacsci.com",
-                "url": "http://gitlab.chinacsci.com/"
+                "icon": "https://logo.clearbit.com/gitlab.chinamhuahe.com",
+                "url": "http://gitlab.chinamhuahe.com/"
               },
               {
                 "type": "link",
@@ -1852,8 +1852,8 @@
                 "type": "link",
                 "addDate": 1670219493144,
                 "title": "我的地盘 - 禅道",
-                "icon": "https://logo.clearbit.com/teamwork.chinacsci.com",
-                "url": "https://teamwork.chinacsci.com/zentao/my/"
+                "icon": "https://logo.clearbit.com/teamwork.chinamhuahe.com",
+                "url": "https://teamwork.chinamhuahe.com/zentao/my/"
               },
               {
                 "type": "link",
@@ -1866,8 +1866,8 @@
                 "type": "link",
                 "addDate": 1680155205047,
                 "title": "数据接口平台",
-                "icon": "https://logo.clearbit.com/open.csci.cloud",
-                "url": "https://open.csci.cloud/api-pub/detail?categoryId=300001&apiId=30"
+                "icon": "https://logo.clearbit.com/open.mhuahe.cloud",
+                "url": "https://open.mhuahe.cloud/api-pub/detail?categoryId=300001&apiId=30"
               },
               {
                 "type": "link",
@@ -1880,8 +1880,8 @@
                 "type": "link",
                 "addDate": 1683511528538,
                 "title": "Daas数据服务平台",
-                "icon": "https://logo.clearbit.com/daas.chinacsci.com",
-                "url": "https://daas.chinacsci.com/#/shop/product-list"
+                "icon": "https://logo.clearbit.com/daas.chinamhuahe.com",
+                "url": "https://daas.chinamhuahe.com/#/shop/product-list"
               },
               {
                 "type": "link",
@@ -1893,7 +1893,7 @@
               {
                 "type": "link",
                 "addDate": 1699517022173,
-                "title": "ApiFox（CSCI）",
+                "title": "ApiFox（mhuahe）",
                 "icon": "https://logo.clearbit.com/app.apifox.com",
                 "url": "https://app.apifox.com/project/3349919"
               },

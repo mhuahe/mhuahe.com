@@ -767,14 +767,14 @@ project标签下除了modelVersion和坐标标签之外，其它标签都可以�
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.csci.china</groupId>
-                <artifactId>csci-ibmp-spring-boot-starter</artifactId>
+                <groupId>com.mhuahe.china</groupId>
+                <artifactId>mhuahe-ibmp-spring-boot-starter</artifactId>
                 <version>${ibmp.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.csci.china</groupId>
-                <artifactId>csci-activiti-spring-boot-starter</artifactId>
-                <version>${csci.activiti.version}</version>
+                <groupId>com.mhuahe.china</groupId>
+                <artifactId>mhuahe-activiti-spring-boot-starter</artifactId>
+                <version>${mhuahe.activiti.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
