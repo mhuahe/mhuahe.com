@@ -108,6 +108,47 @@ connectionTimeout = 0
 String sendText = MailUtil.sendText("1075335917@qq.com", "测试邮件", "这是正文");
 ```
 
+#### 如何获取谷歌应用专用密码
+前提条件
+谷歌账户必须启用两步验证（2FA）
+
+需要使用 Gmail 发送邮件
+
+详细步骤
+第一步：启用两步验证（如果尚未启用）
+访问 https://myaccount.google.com/security
+
+登录你的谷歌账号
+
+找到"两步验证"（2-Step Verification）
+
+点击"开始"并按照提示设置
+
+第二步：生成应用专用密码
+访问应用密码页面：
+
+直接访问：https://myaccount.google.com/apppasswords
+
+或者：安全设置 → 应用专用密码
+
+选择应用：
+
+在"选择应用"下拉菜单中，选择"邮件"
+
+选择设备：
+
+在"选择设备"下拉菜单中，选择"其他（自定义名称）"
+
+输入一个容易识别的名称，例如："Spring Boot Mail"
+
+生成密码：
+
+点击"生成"
+
+你会看到一个 16位的密码（格式如：xxxx xxxx xxxx xxxx）
+
+立即复制这个密码，因为它只显示一次！
+
 ### RadixUtil 进制转换
 
 ```java
