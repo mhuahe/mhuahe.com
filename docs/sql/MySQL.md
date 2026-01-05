@@ -1500,6 +1500,42 @@ LIMIT 100;
 
 ---
 
+## 分页
+
+### 游标式分页
+
+MyBatis-Plus 的 selectPage(pageNum, pageSize)，MySQL底层会生成类似：
+```sql
+SELECT ... FROM deviceinfo
+ORDER BY mac
+LIMIT 1000 OFFSET 700000;
+```
+当 pageNum 越大，OFFSET 越大，MySQL 每次都要丢弃前面几十万行，整体复杂度接近 O(n²)，后半段会越来越慢（你现在看到的就是这个现象）。
+
+改法思路：
+不再用 pageNum + OFFSET，改用「基于主键/索引字段的游标分页」：
+假设 mac 是主键（或者有唯一索引），就按 mac 排序，一直用 mac > lastMac 继续往后扫。
+
+```java
+String lastMac = null;
+while (true) {
+    List<DeviceInfo> list = queryNextPageByMac(dataSourceType, lastMac, PAGE_SIZE);
+    if (list.isEmpty()) break;
+
+    // 逻辑代码
+    lastMac = list.get(list.size() - 1).getMac();
+}
+```
+queryNextPageByMac 里对应 SQL 变成：
+```sql
+SELECT mac, model, activitytime
+FROM deviceinfo
+WHERE (:lastMac IS NULL OR mac > :lastMac)
+ORDER BY mac
+LIMIT :pageSize;
+```
+这样 MySQL 只做一次索引顺序扫描，整体复杂度变回 O(n)，即使 150 万行，速度也会稳定很多，不会越到后面越慢。
+
 ## LeetCode
 
 
