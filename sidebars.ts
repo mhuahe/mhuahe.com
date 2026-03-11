@@ -90,6 +90,7 @@ const sidebars: SidebarsConfig = {
         'java/JAVA-Guava',
         'java/JAVA-Encryption',
         'java/JAVA-WebSocket',
+        'java/JAVA-Arthas',
       ],
     },
   ],
