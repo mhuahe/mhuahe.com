@@ -216,6 +216,9 @@ https://www.typora.io/
 ### notion
 https://www.notion.so/
 
+### flowus
+https://flowus.cn/
+
 ### Obsidian
 https://obsidian.md/
 
@@ -330,6 +333,11 @@ https://github.com/AlistGo/alist
 https://motrix.app/
 
 > 一个基于 Electron 和 Flutter 的多协议、多来源的下载工具
+
+### misterdownloadmanager
+https://github.com/anefzaoui/misterdownloadmanager
+
+> 开源免费的，可集成浏览器插件的下载工具
 
 ### you-get
 https://you-get.org/
